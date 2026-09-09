@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Latihan Kerja & Psikotes</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #2c3e50; }
+        .hidden { display: none !important; }
+        .btn { background: #3498db; color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; margin: 5px 0; font-weight: bold; }
+        .btn:hover { background: #2980b9; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #2ecc71; }
+        .btn-success:hover { background: #27ae60; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .card { background: #f8f9fa; border-left: 5px solid #3498db; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table, th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .guide-box { background: #eef9fe; border: 1px solid #b6e2f8; padding: 10px; border-radius: 5px; font-size: 0.9em; margin-bottom: 10px; }
+        .nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- NAVBAR (Status Login) -->
+    <div id="nav-bar" class="nav hidden">
+        <div>
+            Status: <strong id="user-display-name"></strong> (<span id="user-display-role"></span>)
+        </div>
+        <button class="btn btn-danger" onclick="logout()">Keluar (Logout)</button>
+    </div>
+
+    <!-- HALAMAN 1: FORM LOGIN / REGISTRASI -->
+    <div id="auth-section">
+        <h2>Selamat Datang di Platform Latihan Kerja</h2>
+        <p>Silakan masuk atau buat akun baru (Pilih peran sebagai Anak/User atau Superadmin).</p>
+        
+        <div style="display: flex; gap: 20px;">
+            <!-- Form Login -->
+            <div style="flex: 1;" class="card">
+                <h3>Masuk (Login)</h3>
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="Contoh: user@gmail.com">
+                <label>Kata Sandi</label>
+                <input type="password" id="login-password">
+                <button class="btn" onclick="login()">Masuk</button>
+            </div>
+
+            <!-- Form Registrasi -->
+            <div style="flex: 1;" class="card">
+                <h3>Daftar Akun Baru</h3>
+                <label>Nama Lengkap</label>
+                <input type="text" id="reg-name" placeholder="Nama Anda">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="email@gmail.com">
+                <label>Kata Sandi</label>
+                <input type="password" id="reg-password">
+                <label>Daftar Sebagai</label>
+                <select id="reg-role">
+                    <option value="user">Anak / Kandidat (User)</option>
+                    <option value="admin">Superadmin (Pengawas)</option>
+                </select>
+                <button class="btn btn-success" onclick="register()">Daftar Akun</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN 2: DASHBOARD USER (ANAK) -->
+    <div id="user-dashboard" class="hidden">
+        <h2>Menu Latihan Saya</h2>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn" onclick="showModule('interview')">1. Latihan Wawancara Kerja</button>
+            <button class="btn" onclick="showModule('psychotest')">2. Tes Psikotes Logika</button>
+        </div>
+
+        <!-- Modul Wawancara -->
+        <div id="interview-module" class="hidden">
+            <h3>Latihan Wawancara Kerja</h3>
+            <div class="card">
+                <h4>Pertanyaan: "Ceritakan pengalaman Anda saat menghadapi tantangan berat dan bagaimana menyelesaikannya?"</h4>
+                <div class="guide-box">
+                    <strong>💡 Panduan Menjawab (Metode STAR):</strong>
+                    <ul>
+                        <li><strong>S (Situation):</strong> Jelaskan situasi/latar belakang masalah secara singkat.</li>
+                        <li><strong>T (Task):</strong> Jelaskan apa tanggung jawab atau tugas Anda dalam situasi tersebut.</li>
+                        <li><strong>A (Action):</strong> Jelaskan tindakan konkret yang Anda ambil untuk mengatasi masalah.</li>
+                        <li><strong>R (Result):</strong> Jelaskan hasil positif yang dicapai dari tindakan Anda.</li>
+                    </ul>
+                </div>
+                <label>Tulis Jawaban Anda di Sini:</label>
+                <textarea id="interview-answer" rows="6" placeholder="Ketik jawaban Anda dengan menerapkan rumus STAR..."></textarea>
+                <button class="btn btn-success" onclick="submitInterview()">Kirim Jawaban Wawancara</button>
+            </div>
+        </div>
+
+        <!-- Modul Psikotes -->
+        <div id="psychotest-module" class="hidden">
+            <h3>Tes Psikotes Kerja (Logika Aritmatika)</h3>
+            <form id="psycho-form">
+                <div class="card">
+                    <p><strong>Soal 1:</strong> Berapakah angka selanjutnya dari deret ini? <strong>2, 4, 8, 16, ...</strong></p>
+                    <input type="radio" name="q1" value="20"> 20 <br>
+                    <input type="radio" name="q1" value="32"> 32 <br>
+                    <input type="radio" name="q1" value="24"> 24
+                </div>
+
+                <div class="card">
+                    <p><strong>Soal 2:</strong> Berapakah angka selanjutnya dari deret ini? <strong>5, 10, 15, 20, ...</strong></p>
+                    <input type="radio" name="q2" value="25"> 25 <br>
+                    <input type="radio" name="q2" value="30"> 30 <br>
+                    <input type="radio" name="q2" value="35"> 35
+                </div>
+
+                <button type="button" class="btn btn-success" onclick="submitPsychotest()">Kirim Jawaban Psikotes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- HALAMAN 3: DASHBOARD SUPERADMIN (PENGAWASAN) -->
+    <div id="admin-dashboard" class="hidden">
+        <h2>Panel Pengawasan Superadmin</h2>
+        <p>Gunakan panel ini untuk mengawasi seluruh anak dan hasil latihan mereka.</p>
+
+        <h3>1. Daftar Anak / User Terdaftar</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Peran (Role)</th>
+                </tr>
+            </thead>
+            <tbody id="admin-user-list"></tbody>
+        </table>
+
+        <h3 style="margin-top: 30px;">2. Pengawasan Aktivitas & Hasil Latihan Anak</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Anak</th>
+                    <th>Jenis Latihan</th>
+                    <th>Nilai / Jawaban</th>
+                    <th>Waktu Pengerjaan</th>
+                </tr>
+            </thead>
+            <tbody id="admin-results-list"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // --- PENYIMPANAN DATA SEMENTARA (LOKAL) ---
+    let dbUsers = JSON.parse(localStorage.getItem('app_users')) || [];
+    let dbResults = JSON.parse(localStorage.getItem('app_results')) || [];
+    let currentUser = null;
+
+    // --- FUNGSI AUTHENTIKASI ---
+    function register() {
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const role = document.getElementById('reg-role').value;
+
+        if(!name || !email || !password) {
+            alert('Mohon isi semua kolom pendaftaran!');
+            return;
+        }
+
+        if(dbUsers.find(u => u.email === email)) {
+            alert('Email sudah terdaftar!');
+            return;
+        }
+
+        const newUser = { id: dbUsers.length + 1, name, email, password, role };
+        dbUsers.push(newUser);
+        localStorage.setItem('app_users', JSON.stringify(dbUsers));
+        alert('Pendaftaran berhasil! Silakan login.');
+        
+        // Clear input
+        document.getElementById('reg-name').value = '';
+        document.getElementById('reg-email').value = '';
+        document.getElementById('reg-password').value = '';
+    }
+
+    function login() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        const user = dbUsers.find(u => u.email === email && u.password === password);
+
+        if(!user) {
+            alert('Email atau Kata Sandi salah!');
+            return;
+        }
+
+        currentUser = user;
+        document.getElementById('nav-bar').classList.remove('hidden');
+        document.getElementById('user-display-name').innerText = user.name;
+        document.getElementById('user-display-role').innerText = user.role.toUpperCase();
+        document.getElementById('auth-section').classList.add('hidden');
+
+        if(user.role === 'admin') {
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            loadAdminData();
+        } else {
+            document.getElementById('user-dashboard').classList.remove('hidden');
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('nav-bar').classList.add('hidden');
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('user-dashboard').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.add('hidden');
+    }
+
+    // --- FUNGSI USER / ANAK ---
+    function showModule(type) {
+        document.getElementById('interview-module').classList.add('hidden');
+        document.getElementById('psychotest-module').classList.add('hidden');
+
+        if(type === 'interview') {
+            document.getElementById('interview-module').classList.remove('hidden');
+        } else if(type === 'psychotest') {
+            document.getElementById('psychotest-module').classList.remove('hidden');
+        }
+    }
+
+    function submitInterview() {
+        const answer = document.getElementById('interview-answer').value;
+        if(!answer.trim()) {
+            alert('Harap isi jawaban Anda terlebih dahulu!');
+            return;
+        }
+
+        const result = {
+            userName: currentUser.name,
+            type: 'Wawancara Kerja',
+            detail: 'Jawaban: ' + answer,
+            date: new Date().toLocaleString()
+        };
+
+        dbResults.push(result);
+        localStorage.setItem('app_results', JSON.stringify(dbResults));
+        alert('Jawaban wawancara berhasil dikirim dan dapat dipantau oleh Superadmin!');
+        document.getElementById('interview-answer').value = '';
+    }
+
+    function submitPsychotest() {
+        const q1 = document.querySelector('input[name="q1"]:checked');
+        const q2 = document.querySelector('input[name="q2"]:checked');
+
+        if(!q1 || !q2) {
+            alert('Harap jawab semua soal tes psikotes!');
+            return;
+        }
+
+        let score = 0;
+        if(q1.value === '32') score += 50; // Kunci jawaban Q1
+        if(q2.value === '25') score += 50; // Kunci jawaban Q2
+
+        const result = {
+            userName: currentUser.name,
+            type: 'Tes Psikotes Logika',
+            detail: 'Skor Akhir: ' + score + ' / 100',
+            date: new Date().toLocaleString()
+        };
+
+        dbResults.push(result);
+        localStorage.setItem('app_results', JSON.stringify(dbResults));
+        alert('Tes selesai! Nilai Anda: ' + score + '. Hasil ini telah dikirim ke Superadmin.');
+        document.getElementById('psycho-form').reset();
+    }
+
+    // --- FUNGSI SUPERADMIN (PENGAWASAN) ---
+    function loadAdminData() {
+        // Render Daftar User
+        const userTbody = document.getElementById('admin-user-list');
+        userTbody.innerHTML = '';
+        dbUsers.forEach(u => {
+            userTbody.innerHTML += `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td><strong>${u.role}</strong></td>
+                </tr>
+            `;
+        });
+
+        // Render Hasil Latihan
+        const resultTbody = document.getElementById('admin-results-list');
+        resultTbody.innerHTML = '';
+        if(dbResults.length === 0) {
+            resultTbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Belum ada latihan yang dikerjakan anak.</td></tr>`;
+        } else {
+            dbResults.forEach(r => {
+                resultTbody.innerHTML += `
+                    <tr>
+                        <td><strong>${r.userName}</strong></td>
+                        <td>${r.type}</td>
+                        <td>${r.detail}</td>
+                        <td>${r.date}</td>
+                    </tr>
+                `;
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
