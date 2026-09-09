@@ -3,318 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Platform Latihan Kerja & Psikotes</title>
-    <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1, h2, h3 { color: #2c3e50; }
-        .hidden { display: none !important; }
-        .btn { background: #3498db; color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; margin: 5px 0; font-weight: bold; }
-        .btn:hover { background: #2980b9; }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-        .btn-success { background: #2ecc71; }
-        .btn-success:hover { background: #27ae60; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 15px; border: 1px solid #ccc; border-radius: 5px; }
-        .card { background: #f8f9fa; border-left: 5px solid #3498db; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        table, th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .guide-box { background: #eef9fe; border: 1px solid #b6e2f8; padding: 10px; border-radius: 5px; font-size: 0.9em; margin-bottom: 10px; }
-        .nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-    </style>
+    <title>Sistem Informasi Manajemen Kelas & Privasi Data</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-100 font-sans text-slate-800">
 
-<div class="container">
-    <!-- NAVBAR (Status Login) -->
-    <div id="nav-bar" class="nav hidden">
-        <div>
-            Status: <strong id="user-display-name"></strong> (<span id="user-display-role"></span>)
+    <!-- Header Navigation -->
+    <header class="bg-indigo-600 text-white shadow-md p-4 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span>🏫</span> SI-WALI PUSAT
+            </h1>
+            <div id="userInfoHeader" class="text-xs bg-indigo-800 px-3 py-1.5 rounded-full hidden"></div>
         </div>
-        <button class="btn btn-danger" onclick="logout()">Keluar (Logout)</button>
-    </div>
+    </header>
 
-    <!-- HALAMAN 1: FORM LOGIN / REGISTRASI -->
-    <div id="auth-section">
-        <h2>Selamat Datang di Platform Latihan Kerja</h2>
-        <p>Silakan masuk atau buat akun baru (Pilih peran sebagai Anak/User atau Superadmin).</p>
-        
-        <div style="display: flex; gap: 20px;">
-            <!-- Form Login -->
-            <div style="flex: 1;" class="card">
-                <h3>Masuk (Login)</h3>
-                <label>Email</label>
-                <input type="email" id="login-email" placeholder="Contoh: user@gmail.com">
-                <label>Kata Sandi</label>
-                <input type="password" id="login-password">
-                <button class="btn" onclick="login()">Masuk</button>
-            </div>
+    <main class="max-w-6xl mx-auto p-4 space-y-6">
 
-            <!-- Form Registrasi -->
-            <div style="flex: 1;" class="card">
-                <h3>Daftar Akun Baru</h3>
-                <label>Nama Lengkap</label>
-                <input type="text" id="reg-name" placeholder="Nama Anda">
-                <label>Email</label>
-                <input type="email" id="reg-email" placeholder="email@gmail.com">
-                <label>Kata Sandi</label>
-                <input type="password" id="reg-password">
-                <label>Daftar Sebagai</label>
-                <select id="reg-role">
-                    <option value="user">Anak / Kandidat (User)</option>
-                    <option value="admin">Superadmin (Pengawas)</option>
-                </select>
-                <button class="btn btn-success" onclick="register()">Daftar Akun</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- HALAMAN 2: DASHBOARD USER (ANAK) -->
-    <div id="user-dashboard" class="hidden">
-        <h2>Menu Latihan Saya</h2>
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn" onclick="showModule('interview')">1. Latihan Wawancara Kerja</button>
-            <button class="btn" onclick="showModule('psychotest')">2. Tes Psikotes Logika</button>
-        </div>
-
-        <!-- Modul Wawancara -->
-        <div id="interview-module" class="hidden">
-            <h3>Latihan Wawancara Kerja</h3>
-            <div class="card">
-                <h4>Pertanyaan: "Ceritakan pengalaman Anda saat menghadapi tantangan berat dan bagaimana menyelesaikannya?"</h4>
-                <div class="guide-box">
-                    <strong>💡 Panduan Menjawab (Metode STAR):</strong>
-                    <ul>
-                        <li><strong>S (Situation):</strong> Jelaskan situasi/latar belakang masalah secara singkat.</li>
-                        <li><strong>T (Task):</strong> Jelaskan apa tanggung jawab atau tugas Anda dalam situasi tersebut.</li>
-                        <li><strong>A (Action):</strong> Jelaskan tindakan konkret yang Anda ambil untuk mengatasi masalah.</li>
-                        <li><strong>R (Result):</strong> Jelaskan hasil positif yang dicapai dari tindakan Anda.</li>
-                    </ul>
+        <!-- FORM LOGIN -->
+        <div id="loginSection" class="max-w-md mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h2 class="text-xl font-bold text-center">Masuk Portal Kelas</h2>
+            <form onsubmit="handleLogin(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                    <input type="text" id="loginUsername" required placeholder="Masukkan username" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                <label>Tulis Jawaban Anda di Sini:</label>
-                <textarea id="interview-answer" rows="6" placeholder="Ketik jawaban Anda dengan menerapkan rumus STAR..."></textarea>
-                <button class="btn btn-success" onclick="submitInterview()">Kirim Jawaban Wawancara</button>
-            </div>
-        </div>
-
-        <!-- Modul Psikotes -->
-        <div id="psychotest-module" class="hidden">
-            <h3>Tes Psikotes Kerja (Logika Aritmatika)</h3>
-            <form id="psycho-form">
-                <div class="card">
-                    <p><strong>Soal 1:</strong> Berapakah angka selanjutnya dari deret ini? <strong>2, 4, 8, 16, ...</strong></p>
-                    <input type="radio" name="q1" value="20"> 20 <br>
-                    <input type="radio" name="q1" value="32"> 32 <br>
-                    <input type="radio" name="q1" value="24"> 24
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Masukkan password" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-
-                <div class="card">
-                    <p><strong>Soal 2:</strong> Berapakah angka selanjutnya dari deret ini? <strong>5, 10, 15, 20, ...</strong></p>
-                    <input type="radio" name="q2" value="25"> 25 <br>
-                    <input type="radio" name="q2" value="30"> 30 <br>
-                    <input type="radio" name="q2" value="35"> 35
-                </div>
-
-                <button type="button" class="btn btn-success" onclick="submitPsychotest()">Kirim Jawaban Psikotes</button>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                    Masuk
+                </button>
             </form>
         </div>
-    </div>
 
-    <!-- HALAMAN 3: DASHBOARD SUPERADMIN (PENGAWASAN) -->
-    <div id="admin-dashboard" class="hidden">
-        <h2>Panel Pengawasan Superadmin</h2>
-        <p>Gunakan panel ini untuk mengawasi seluruh anak dan hasil latihan mereka.</p>
+        <!-- DASHBOARD UTAMA -->
+        <div id="dashboardSection" class="hidden space-y-6">
 
-        <h3>1. Daftar Anak / User Terdaftar</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>Peran (Role)</th>
-                </tr>
-            </thead>
-            <tbody id="admin-user-list"></tbody>
-        </table>
+            <!-- Status Sesi -->
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div>
+                    <span class="text-xs text-slate-400 block">Sesi Aktif:</span>
+                    <span id="sessionDetail" class="font-bold text-slate-700"></span>
+                </div>
+                <button onclick="logout()" class="text-xs text-rose-600 bg-rose-50 px-3 py-2 rounded-lg font-bold hover:bg-rose-100">Keluar / Logout</button>
+            </div>
 
-        <h3 style="margin-top: 30px;">2. Pengawasan Aktivitas & Hasil Latihan Anak</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nama Anak</th>
-                    <th>Jenis Latihan</th>
-                    <th>Nilai / Jawaban</th>
-                    <th>Waktu Pengerjaan</th>
-                </tr>
-            </thead>
-            <tbody id="admin-results-list"></tbody>
-        </table>
-    </div>
-</div>
+            <!-- PANEL SUPERADMIN -->
+            <div id="superadminPanel" class="hidden space-y-6">
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                    <h3 class="font-bold text-amber-800 text-lg">Panel Pengelola Pusat (Superadmin)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+                        <h4 class="font-bold text-slate-700">Buat Akun Wali Kelas</h4>
+                        <form onsubmit="createTeacherAccount(event)" class="space-y-3">
+                            <input type="text" id="teacherName" placeholder="Nama Guru" required class="w-full p-2 border rounded text-sm">
+                            <input type="text" id="className" placeholder="Nama Kelas (misal: 7A)" required class="w-full p-2 border rounded text-sm">
+                            <input type="text" id="teacherUsername" placeholder="Username" required class="w-full p-2 border rounded text-sm">
+                            <input type="password" id="teacherPassword" placeholder="Password" required class="w-full p-2 border rounded text-sm">
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded text-sm font-medium hover:bg-indigo-700">+ Daftarkan Wali Kelas</button>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border">
+                        <h4 class="font-bold text-slate-700 mb-3">Daftar Wali Kelas Terdaftar</h4>
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b text-xs text-slate-500">
+                                    <th class="p-2">Nama Guru</th>
+                                    <th class="p-2">Kelas</th>
+                                    <th class="p-2">Username</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherTableBody" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<script>
-    // --- PENYIMPANAN DATA SEMENTARA (LOKAL) ---
-    let dbUsers = JSON.parse(localStorage.getItem('app_users')) || [];
-    let dbResults = JSON.parse(localStorage.getItem('app_results')) || [];
-    let currentUser = null;
+            <!-- PANEL KHUSUS WALI KELAS -->
+            <div id="teacherPanel" class="hidden space-y-6">
+                <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="font-bold text-indigo-900 text-lg">Panel Wali Kelas - <span id="teacherClassName"></span></h3>
+                        <p class="text-xs text-indigo-700">Kelola akun, agenda kunjungan, serta rekap data siswa & orang tua.</p>
+                    </div>
+                    <!-- Tombol Unduh Rekap Data Excel/CSV -->
+                    <button onclick="exportDataToCSV()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 flex items-center gap-1 shadow-sm">
+                        📥 Unduh Rekap Data (Excel/CSV)
+                    </button>
+                </div>
 
-    // --- FUNGSI AUTHENTIKASI ---
-    function register() {
-        const name = document.getElementById('reg-name').value;
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
-        const role = document.getElementById('reg-role').value;
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Form Buat Akun -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+                        <h4 class="font-bold text-slate-700">Buat Akun Siswa/Ortu</h4>
+                        <form onsubmit="createStudentAccount(event)" class="space-y-3">
+                            <input type="text" id="studentName" placeholder="Nama Lengkap" required class="w-full p-2 border rounded text-sm">
+                            <input type="text" id="studentUsername" placeholder="Username" required class="w-full p-2 border rounded text-sm">
+                            <input type="password" id="studentPassword" placeholder="Password" required class="w-full p-2 border rounded text-sm">
+                            <select id="userRoleType" class="w-full p-2 border rounded text-sm bg-white">
+                                <option value="Siswa">Siswa / Murid</option>
+                                <option value="Orang Tua">Orang Tua</option>
+                            </select>
+                            <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded text-sm font-medium hover:bg-emerald-700">+ Buat Akun Baru</button>
+                        </form>
+                    </div>
 
-        if(!name || !email || !password) {
-            alert('Mohon isi semua kolom pendaftaran!');
-            return;
-        }
+                    <!-- Agendakan Kunjungan Rumah -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+                        <h4 class="font-bold text-slate-700">🏠 Agendakan Kunjungan Rumah</h4>
+                        <form onsubmit="createHomeVisit(event)" class="space-y-3">
+                            <input type="text" id="visitStudentName" placeholder="Nama Siswa" required class="w-full p-2 border rounded text-sm">
+                            <input type="date" id="visitDate" required class="w-full p-2 border rounded text-sm">
+                            <textarea id="visitAgenda" placeholder="Agenda Kunjungan" required class="w-full p-2 border rounded text-sm h-16"></textarea>
+                            <button type="submit" class="w-full bg-amber-600 text-white py-2 rounded text-sm font-medium hover:bg-amber-700">+ Tambah Agenda</button>
+                        </form>
+                    </div>
+                </div>
 
-        if(dbUsers.find(u => u.email === email)) {
-            alert('Email sudah terdaftar!');
-            return;
-        }
+                <!-- Rekap Profil Data Siswa (HANYA TAMPIL DI WALI KELAS) -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+                    <h4 class="font-bold text-slate-700">📋 Rekap Profil Data Siswa</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 border-b">
+                                    <th class="p-2">Nama</th>
+                                    <th class="p-2">No. HP</th>
+                                    <th class="p-2">Alamat</th>
+                                    <th class="p-2">Tinggal Bersama</th>
+                                    <th class="p-2">Orang Tua</th>
+                                    <th class="p-2">Hobi / Kegiatan / Suka</th>
+                                    <th class="p-2">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentProfileTableBody" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
 
-        const newUser = { id: dbUsers.length + 1, name, email, password, role };
-        dbUsers.push(newUser);
-        localStorage.setItem('app_users', JSON.stringify(dbUsers));
-        alert('Pendaftaran berhasil! Silakan login.');
-        
-        // Clear input
-        document.getElementById('reg-name').value = '';
-        document.getElementById('reg-email').value = '';
-        document.getElementById('reg-password').value = '';
-    }
+                <!-- Rekap Profil Data Orang Tua (HANYA TAMPIL DI WALI KELAS) -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+                    <h4 class="font-bold text-slate-700">📋 Rekap Profil Data Orang Tua</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 border-b">
+                                    <th class="p-2">Nama Ortu</th>
+                                    <th class="p-2">No. HP</th>
+                                    <th class="p-2">Pekerjaan & Penghasilan</th>
+                                    <th class="p-2">Alamat</th>
+                                    <th class="p-2">Sifat, Karakter & Pergaulan Anak</th>
+                                    <th class="p-2">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parentProfileTableBody" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    function login() {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
+            <!-- PANEL ISIAN FORM SISWA -->
+            <div id="studentFormPanel" class="hidden bg-white p-5 rounded-xl shadow-sm border space-y-4">
+                <h4 class="font-bold text-slate-700 border-b pb-2">📝 Form Isian Profil Siswa</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <input type="text" id="sPhone" placeholder="Nomor HP Siswa" class="p-2 border rounded">
+                    <input type="text" id="sAddress" placeholder="Alamat Rumah Lengkap" class="p-2 border rounded">
+                    <input type="text" id="sLiveWith" placeholder="Tinggal Bersama Siapa?" class="p-2 border rounded">
+                    <input type="text" id="sFather" placeholder="Nama Ayah" class="p-2 border rounded">
+                    <input type="text" id="sMother" placeholder="Nama Ibu" class="p-2 border rounded">
+                    <input type="text" id="sHobby" placeholder="Hobi" class="p-2 border rounded">
+                    <input type="text" id="sActivity" placeholder="Kegiatan Harian" class="p-2 border rounded">
+                    <input type="text" id="sFavorite" placeholder="Kesukaan / Hal Favorit" class="p-2 border rounded">
+                </div>
+                <button onclick="saveStudentData()" class="bg-emerald-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-emerald-700">Simpan Profil Saya</button>
+            </div>
 
-        const user = dbUsers.find(u => u.email === email && u.password === password);
+            <!-- PANEL ISIAN FORM ORANG TUA -->
+            <div id="parentFormPanel" class="hidden bg-white p-5 rounded-xl shadow-sm border space-y-4">
+                <h4 class="font-bold text-slate-700 border-b pb-2">👨‍👩‍👧 Form Isian Profil Orang Tua</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <input type="text" id="pPhone" placeholder="Nomor HP / WhatsApp" class="p-2 border rounded">
+                    <input type="text" id="pJob" placeholder="Pekerjaan" class="p-2 border rounded">
+                    <input type="text" id="pIncome" placeholder="Penghasilan Bulanan" class="p-2 border rounded">
+                    <input type="text" id="pAddress" placeholder="Alamat Rumah Lengkap" class="p-2 border rounded">
+                    <textarea id="pTrait" placeholder="Sifat Anak" class="p-2 border rounded h-20"></textarea>
+                    <textarea id="pCharacter" placeholder="Karakter Anak" class="p-2 border rounded h-20"></textarea>
+                    <textarea id="pSocial" placeholder="Pergaulan Anak" class="p-2 border rounded h-20 md:col-span-2"></textarea>
+                </div>
+                <button onclick="saveParentData()" class="bg-emerald-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-emerald-700">Simpan Profil Saya</button>
+            </div>
 
-        if(!user) {
-            alert('Email atau Kata Sandi salah!');
-            return;
-        }
+            <!-- AGENDA KUNJUNGAN RUMAH (DITAMPILKAN KE SEMUA PERAN: WALI KELAS, SISWA & ORTU) -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
+                <h4 class="font-bold text-slate-700 flex items-center gap-2">
+                    <span>📅</span> Agenda Kunjungan Rumah (Home Visit)
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b text-xs text-slate-500">
+                                <th class="p-2">Tanggal</th>
+                                <th class="p-2">Nama Siswa</th>
+                                <th class="p-2">Kelas</th>
+                                <th class="p-2">Agenda / Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="homeVisitTableBody" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
 
-        currentUser = user;
-        document.getElementById('nav-bar').classList.remove('hidden');
-        document.getElementById('user-display-name').innerText = user.name;
-        document.getElementById('user-display-role').innerText = user.role.toUpperCase();
-        document.getElementById('auth-section').classList.add('hidden');
+            <!-- DISKUSI KELAS -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
+                <h4 class="font-bold text-slate-700">💬 Kolom Diskusi Kelas (<span id="chatClassName"></span>)</h4>
+                <div class="flex gap-2">
+                    <input type="text" id="chatMessage" placeholder="Tulis pesan..." class="flex-1 p-2 border rounded text-sm">
+                    <button onclick="sendChatMessage()" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium">Kirim</button>
+                </div>
+                <div id="chatContainer" class="space-y-3 max-h-80 overflow-y-auto"></div>
+            </div>
 
-        if(user.role === 'admin') {
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            loadAdminData();
-        } else {
-            document.getElementById('user-dashboard').classList.remove('hidden');
-        }
-    }
+        </div>
 
-    function logout() {
-        currentUser = null;
-        document.getElementById('nav-bar').classList.add('hidden');
-        document.getElementById('auth-section').classList.remove('hidden');
-        document.getElementById('user-dashboard').classList.add('hidden');
-        document.getElementById('admin-dashboard').classList.add('hidden');
-    }
+    </main>
 
-    // --- FUNGSI USER / ANAK ---
-    function showModule(type) {
-        document.getElementById('interview-module').classList.add('hidden');
-        document.getElementById('psychotest-module').classList.add('hidden');
-
-        if(type === 'interview') {
-            document.getElementById('interview-module').classList.remove('hidden');
-        } else if(type === 'psychotest') {
-            document.getElementById('psychotest-module').classList.remove('hidden');
-        }
-    }
-
-    function submitInterview() {
-        const answer = document.getElementById('interview-answer').value;
-        if(!answer.trim()) {
-            alert('Harap isi jawaban Anda terlebih dahulu!');
-            return;
-        }
-
-        const result = {
-            userName: currentUser.name,
-            type: 'Wawancara Kerja',
-            detail: 'Jawaban: ' + answer,
-            date: new Date().toLocaleString()
+    <!-- LOGIKA APP & UNDUH DATA -->
+    <script>
+        let db = JSON.parse(localStorage.getItem('si_wali_db')) || {
+            users: [
+                { id: 1, name: 'Super Admin Pusat', username: 'admin', password: 'admin123', role: 'superadmin', className: 'Pusat' }
+            ],
+            discussions: [],
+            homeVisits: []
         };
 
-        dbResults.push(result);
-        localStorage.setItem('app_results', JSON.stringify(dbResults));
-        alert('Jawaban wawancara berhasil dikirim dan dapat dipantau oleh Superadmin!');
-        document.getElementById('interview-answer').value = '';
-    }
+        let currentSession = null;
 
-    function submitPsychotest() {
-        const q1 = document.querySelector('input[name="q1"]:checked');
-        const q2 = document.querySelector('input[name="q2"]:checked');
-
-        if(!q1 || !q2) {
-            alert('Harap jawab semua soal tes psikotes!');
-            return;
+        function saveDB() {
+            localStorage.setItem('si_wali_db', JSON.stringify(db));
         }
 
-        let score = 0;
-        if(q1.value === '32') score += 50; // Kunci jawaban Q1
-        if(q2.value === '25') score += 50; // Kunci jawaban Q2
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+            const foundUser = db.users.find(user => user.username === u && user.password === p);
 
-        const result = {
-            userName: currentUser.name,
-            type: 'Tes Psikotes Logika',
-            detail: 'Skor Akhir: ' + score + ' / 100',
-            date: new Date().toLocaleString()
-        };
+            if (foundUser) {
+                currentSession = foundUser;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                renderDashboard();
+            } else {
+                alert('Username atau password salah!');
+            }
+        }
 
-        dbResults.push(result);
-        localStorage.setItem('app_results', JSON.stringify(dbResults));
-        alert('Tes selesai! Nilai Anda: ' + score + '. Hasil ini telah dikirim ke Superadmin.');
-        document.getElementById('psycho-form').reset();
-    }
+        function logout() {
+            currentSession = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+        }
 
-    // --- FUNGSI SUPERADMIN (PENGAWASAN) ---
-    function loadAdminData() {
-        // Render Daftar User
-        const userTbody = document.getElementById('admin-user-list');
-        userTbody.innerHTML = '';
-        dbUsers.forEach(u => {
-            userTbody.innerHTML += `
-                <tr>
-                    <td>${u.id}</td>
-                    <td>${u.name}</td>
-                    <td>${u.email}</td>
-                    <td><strong>${u.role}</strong></td>
-                </tr>
-            `;
-        });
+        function renderDashboard() {
+            const header = document.getElementById('userInfoHeader');
+            header.innerText = `${currentSession.name} (${currentSession.role.toUpperCase()})`;
+            header.classList.remove('hidden');
 
-        // Render Hasil Latihan
-        const resultTbody = document.getElementById('admin-results-list');
-        resultTbody.innerHTML = '';
-        if(dbResults.length === 0) {
-            resultTbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Belum ada latihan yang dikerjakan anak.</td></tr>`;
-        } else {
-            dbResults.forEach(r => {
-                resultTbody.innerHTML += `
-                    <tr>
-                        <td><strong>${r.userName}</strong></td>
-                        <td>${r.type}</td>
-                        <td>${r.detail}</td>
-                        <td>${r.date}</td>
-                    </tr>
+            document.getElementById('sessionDetail').innerText = `${currentSession.name} | Peran: ${currentSession.role} | Kelas: ${currentSession.className}`;
+            document.getElementById('chatClassName').innerText = currentSession.className;
+
+            document.getElementById('superadminPanel').classList.add('hidden');
+            document.getElementById('teacherPanel').classList.add('hidden');
+            document.getElementById('studentFormPanel').classList.add('hidden');
+            document.getElementById('parentFormPanel').classList.add('hidden');
+
+            if (currentSession.role === 'superadmin') {
+                document.getElementById('superadminPanel').classList.remove('hidden');
+                renderTeacherList();
+            } else if (currentSession.role === 'walikelas') {
+                document.getElementById('teacherPanel').classList.remove('hidden');
+                document.getElementById('teacherClassName').innerText = currentSession.className;
+                renderStudentProfiles();
+                renderParentProfiles();
+            } else if (currentSession.role === 'Siswa') {
+                document.getElementById('studentFormPanel').classList.remove('hidden');
+                loadStudentForm();
+            } else if (currentSession.role === 'Orang Tua') {
+                document.getElementById('parentFormPanel').classList.remove('hidden');
+                loadParentForm();
+            }
+
+            renderHomeVisits();
+            renderDiscussions();
+        }
+
+        // FITUR UNDUH DATA DATA KE EXCEL/CSV (KHUSUS WALI KELAS)
+        function exportDataToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "REKAP PROFIL DATA SISWA & ORANG TUA - KELAS " + currentSession.className + "\n\n";
+
+            // Header Siswa
+            csvContent += "=== DATA SISWA ===\n";
+            csvContent += "Nama,No HP,Alamat,Tinggal Bersama,Nama Ayah,Nama Ibu,Hobi,Kegiatan,Kesukaan\n";
+            
+            const students = db.users.filter(u => u.className === currentSession.className && u.role === 'Siswa');
+            students.forEach(s => {
+                csvContent += `"${s.name}","${s.sPhone||''}","${s.sAddress||''}","${s.sLiveWith||''}","${s.sFather||''}","${s.sMother||''}","${s.sHobby||''}","${s.sActivity||''}","${s.sFavorite||''}"\n`;
+            });
+
+            csvContent += "\n=== DATA ORANG TUA ===\n";
+            csvContent += "Nama Ortu,No HP,Pekerjaan,Penghasilan,Alamat,Sifat Anak,Karakter Anak,Pergaulan Anak\n";
+
+            const parents = db.users.filter(u => u.className === currentSession.className && u.role === 'Orang Tua');
+            parents.forEach(p => {
+                csvContent += `"${p.name}","${p.pPhone||''}","${p.pJob||''}","${p.pIncome||''}","${p.pAddress||''}","${p.pTrait||''}","${p.pCharacter||''}","${p.pSocial||''}"\n`;
+            });
+
+            // Trigger Download File
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Rekap_Kelas_${currentSession.className}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // SIMPAN PROFIL SISWA
+        function saveStudentData() {
+            const idx = db.users.findIndex(u => u.id === currentSession.id);
+            if (idx !== -1) {
+                db.users[idx].sPhone = document.getElementById('sPhone').value;
+                db.users[idx].sAddress = document.getElementById('sAddress').value;
+                db.users[idx].sLiveWith = document.getElementById('sLiveWith').value;
+                db.users[idx].sFather = document.getElementById('sFather').value;
+                db.users[idx].sMother = document.getElementById('sMother').value;
+                db.users[idx].sHobby = document.getElementById('sHobby').value;
+                db.users[idx].sActivity = document.getElementById('sActivity').value;
+                db.users[idx].sFavorite = document.getElementById('sFavorite').value;
+                currentSession = db.users[idx];
+                saveDB();
+                alert('Profil Siswa Berhasil Disimpan!');
+            }
+        }
+
+        function loadStudentForm() {
+            document.getElementById('sPhone').value = currentSession.sPhone || '';
+            document.getElementById('sAddress').value = currentSession.sAddress || '';
+            document.getElementById('sLiveWith').value = currentSession.sLiveWith || '';
+            document.getElementById('sFather').value = currentSession.sFather || '';
+            document.getElementById('sMother').value = currentSession.sMother || '';
+            document.getElementById('sHobby').value = currentSession.sHobby || '';
+            document.getElementById('sActivity').value = currentSession.sActivity || '';
+            document.getElementById('sFavorite').value = currentSession.sFavorite || '';
+        }
+
+        // SIMPAN PROFIL ORANG TUA
+        function saveParentData() {
+            const idx = db.users.findIndex(u => u.id === currentSession.id);
+            if (idx !== -1) {
+                db.users[idx].pPhone = document.getElementById('pPhone').value;
+                db.users[idx].pJob = document.getElementById('pJob').value;
+                db.users[idx].pIncome = document.getElementById('pIncome').value;
+                db.users[idx].pAddress = document.getElementById('pAddress').value;
+                db.users[idx].pTrait = document.getElementById('pTrait').value;
+                db.users[idx].pCharacter = document.getElementById('pCharacter').value;
+                db.users[idx].pSocial = document.getElementById('pSocial').value;
+                currentSession = db.users[idx];
+                saveDB();
+                alert('Profil Orang Tua Berhasil Disimpan!');
+            }
+        }
+
+        function loadParentForm() {
+            document.getElementById('pPhone').value = currentSession.pPhone || '';
+            document.getElementById('pJob').value = currentSession.pJob || '';
+            document.getElementById('pIncome').value = currentSession.pIncome || '';
+            document.getElementById('pAddress').value = currentSession.pAddress || '';
+            document.getElementById('pTrait').value = currentSession.pTrait || '';
+            document.getElementById('pCharacter').value = currentSession.pCharacter || '';
+            document.getElementById('pSocial').value = currentSession.pSocial || '';
+        }
+
+        // RENDER REKAP DATA (KHUSUS AKUN WALI KELAS)
+        function renderStudentProfiles() {
+            const tbody = document.getElementById('studentProfileTableBody');
+            tbody.innerHTML = '';
+            const students = db.users.filter(u => u.className === currentSession.className && u.role === 'Siswa');
+
+            students.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 font-bold">${s.name}</td>
+                    <td class="p-2">${s.sPhone || '-'}</td>
+                    <td class="p-2">${s.sAddress || '-'}</td>
+                    <td class="p-2">${s.sLiveWith || '-'}</td>
+                    <td class="p-2">Ayah: ${s.sFather || '-'}<br>Ibu: ${s.sMother || '-'}</td>
+                    <td class="p-2">Hobi: ${s.sHobby || '-'}<br>Kegiatan: ${s.sActivity || '-'}<br>Suka: ${s.sFavorite || '-'}</td>
+                    <td class="p-2"><button onclick="deleteUser(${s.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button></td>
                 `;
+                tbody.appendChild(tr);
             });
         }
-    }
-</script>
 
+        function renderParentProfiles() {
+            const tbody = document.getElementById('parentProfileTableBody');
+            tbody.innerHTML = '';
+            const parents = db.users.filter(u => u.className === currentSession.className && u.role === 'Orang Tua');
+
+            parents.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 font-bold">${p.name}</td>
+                    <td class="p-2">${p.pPhone || '-'}</td>
+                    <td class="p-2">Kerja: ${p.pJob || '-'}<br>Gaji: ${p.pIncome || '-'}</td>
+                    <td class="p-2">${p.pAddress || '-'}</td>
+                    <td class="p-2">Sifat: ${p.pTrait || '-'}<br>Karakter: ${p.pCharacter || '-'}<br>Pergaulan: ${p.pSocial || '-'}</td>
+                    <td class="p-2"><button onclick="deleteUser(${p.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteUser(id) {
+            if (confirm('Hapus akun ini?')) {
+                db.users = db.users.filter(u => u.id !== id);
+                saveDB();
+                renderStudentProfiles();
+                renderParentProfiles();
+            }
+        }
+
+        function createTeacherAccount(e) {
+            e.preventDefault();
+            db.users.push({ id: Date.now(), name: document.getElementById('teacherName').value, className: document.getElementById('className').value, username: document.getElementById('teacherUsername').value, password: document.getElementById('teacherPassword').value, role: 'walikelas' });
+            saveDB(); alert('Wali Kelas Didaftarkan!'); renderTeacherList();
+        }
+
+        function renderTeacherList() {
+            const tbody = document.getElementById('teacherTableBody');
+            tbody.innerHTML = db.users.filter(u => u.role === 'walikelas').map(t => `<tr><td class="p-2 font-semibold">${t.name}</td><td class="p-2">${t.className}</td><td class="p-2">${t.username}</td></tr>`).join('');
+        }
+
+        function createStudentAccount(e) {
+            e.preventDefault();
+            db.users.push({ id: Date.now(), name: document.getElementById('studentName').value, className: currentSession.className, username: document.getElementById('studentUsername').value, password: document.getElementById('studentPassword').value, role: document.getElementById('userRoleType').value });
+            saveDB(); alert('Akun Dibuat!'); renderStudentProfiles(); renderParentProfiles();
+        }
+
+        function createHomeVisit(e) {
+            e.preventDefault();
+            db.homeVisits.push({ id: Date.now(), className: currentSession.className, studentName: document.getElementById('visitStudentName').value, date: document.getElementById('visitDate').value, agenda: document.getElementById('visitAgenda').value });
+            saveDB(); alert('Jadwal Disimpan!'); renderHomeVisits();
+        }
+
+        function renderHomeVisits() {
+            const visits = db.homeVisits.filter(v => v.className === currentSession.className || currentSession.role === 'superadmin');
+            document.getElementById('homeVisitTableBody').innerHTML = visits.map(v => `<tr><td class="p-2">${v.date}</td><td class="p-2 font-bold">${v.studentName}</td><td class="p-2">${v.className}</td><td class="p-2">${v.agenda}</td></tr>`).join('');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatMessage');
+            if (!input.value.trim()) return;
+            db.discussions.unshift({ id: Date.now(), className: currentSession.className, sender: currentSession.name, role: currentSession.role, text: input.value, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            saveDB(); input.value = ''; renderDiscussions();
+        }
+
+        function renderDiscussions() {
+            const chats = db.discussions.filter(d => d.className === currentSession.className || currentSession.role === 'superadmin');
+            document.getElementById('chatContainer').innerHTML = chats.map(c => `<div class="p-2 bg-slate-50 border rounded text-xs"><div class="flex justify-between font-bold text-indigo-600"><span>${c.sender} (${c.role})</span><span>${c.time}</span></div><p class="text-slate-700 mt-1 text-sm">${c.text}</p></div>`).join('');
+        }
+    </script>
 </body>
 </html>
