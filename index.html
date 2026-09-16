@@ -1,1200 +1,428 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SI-WALI - Aplikasi Wali Kelas Super Lengkap</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @media print {
-            body * { visibility: hidden; }
-            #printableCard, #printableCard * { visibility: visible; }
-            #printableCard {
-                position: absolute;
-                left: 50%;
-                top: 20%;
-                transform: translate(-50%, 0);
-                width: 380px !important;
-                border: 1px solid #cbd5e1 !important;
-                box-shadow: none !important;
-            }
-            .no-print { display: none !important; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Wali Kelas Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-slate-100 font-sans text-slate-800">
+<body class="bg-slate-100 font-sans min-h-screen pb-10">
 
-    <!-- Header Navigation -->
-    <header class="bg-indigo-600 text-white shadow-md p-4 sticky top-0 z-50 no-print">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold flex items-center gap-2">
-                <span>🏫</span> SI-WALI PUSAT
-            </h1>
-            <div id="userInfoHeader" class="text-xs bg-indigo-800 px-3 py-1.5 rounded-full hidden"></div>
+  <!-- NAVBAR -->
+  <nav class="bg-indigo-700 text-white p-4 shadow-lg sticky top-0 z-50 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <i class="fa-solid fa-school text-2xl"></i>
+      <h1 class="text-xl font-bold tracking-wide">SIM Wali Kelas</h1>
+    </div>
+    <div id="userBadge" class="hidden flex items-center space-x-3">
+      <span id="userInfo" class="text-xs md:text-sm font-semibold bg-indigo-900 px-3 py-1.5 rounded-full border border-indigo-400"></span>
+      <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg transition font-bold">
+        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+      </button>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-4 max-w-4xl">
+
+    <!-- FORM LOGIN -->
+    <div id="loginSection" class="bg-white p-8 rounded-2xl shadow-xl max-w-md mx-auto my-8 border border-slate-200">
+      <div class="text-center mb-6">
+        <div class="bg-indigo-100 text-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+          <i class="fa-solid fa-user-lock"></i>
         </div>
-    </header>
-
-    <main class="max-w-6xl mx-auto p-4 space-y-6">
-
-        <!-- FORM LOGIN -->
-        <div id="loginSection" class="max-w-md mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 no-print">
-            <h2 class="text-xl font-bold text-center">Masuk Portal Kelas</h2>
-            <form onsubmit="handleLogin(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
-                    <input type="text" id="loginUsername" required placeholder="Masukkan username" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
-                    <input type="password" id="loginPassword" required placeholder="Masukkan password" class="w-full p-2.5 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition">
-                    Masuk
-                </button>
-            </form>
+        <h2 class="text-2xl font-bold text-slate-800">Masuk Aplikasi</h2>
+        <p class="text-xs text-slate-500 mt-1">Gunakan akun Admin, Wali Kelas, Siswa, atau Orang Tua</p>
+      </div>
+      
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">Username / NISN</label>
+          <input type="text" id="loginUser" placeholder="Masukkan username atau NISN" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
         </div>
-
-        <!-- DASHBOARD UTAMA -->
-        <div id="dashboardSection" class="hidden space-y-6">
-
-            <!-- Status Sesi -->
-            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 no-print">
-                <div>
-                    <span class="text-xs text-slate-400 block">Sesi Aktif:</span>
-                    <span id="sessionDetail" class="font-bold text-slate-700"></span>
-                </div>
-                <button onclick="logout()" class="text-xs text-rose-600 bg-rose-50 px-3 py-2 rounded-lg font-bold hover:bg-rose-100">Keluar / Logout</button>
-            </div>
-
-            <!-- PANEL SUPERADMIN -->
-            <div id="superadminPanel" class="hidden space-y-6 no-print">
-                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
-                    <h3 class="font-bold text-amber-800 text-lg">Panel Pengelola Pusat (Superadmin)</h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                        <h4 class="font-bold text-slate-700">Buat Akun Wali Kelas</h4>
-                        <form onsubmit="createTeacherAccount(event)" class="space-y-3">
-                            <input type="text" id="teacherName" placeholder="Nama Guru" required class="w-full p-2 border rounded text-sm">
-                            <input type="text" id="className" placeholder="Nama Kelas (misal: 7A)" required class="w-full p-2 border rounded text-sm">
-                            <input type="text" id="teacherUsername" placeholder="Username" required class="w-full p-2 border rounded text-sm">
-                            <input type="password" id="teacherPassword" placeholder="Password" required class="w-full p-2 border rounded text-sm">
-                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded text-sm font-medium hover:bg-indigo-700">+ Daftarkan Wali Kelas</button>
-                        </form>
-                    </div>
-                    <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border">
-                        <h4 class="font-bold text-slate-700 mb-3">Daftar Wali Kelas Terdaftar</h4>
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="bg-slate-50 border-b text-xs text-slate-500">
-                                    <th class="p-2">Nama Guru</th>
-                                    <th class="p-2">Kelas</th>
-                                    <th class="p-2">Username</th>
-                                </tr>
-                            </thead>
-                            <tbody id="teacherTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANEL WALI KELAS -->
-            <div id="teacherPanel" class="hidden space-y-6 no-print">
-                <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 text-lg">Panel Wali Kelas - <span id="teacherClassName"></span></h3>
-                    <p class="text-xs text-indigo-700">Kelola jadwal mapel, presensi GPS, pembinaan, rekap data profil, hingga surat izin.</p>
-                </div>
-
-                <!-- 1. PENGATURAN JADWAL MATA PELAJARAN PER JAM -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
-                    <h4 class="font-bold text-slate-700 flex items-center gap-2 border-b pb-2">
-                        <span>⏰</span> Pengaturan Jadwal Jam Pelajaran
-                    </h4>
-                    <form onsubmit="saveSchedule(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Jam Ke-</label>
-                            <input type="number" id="schedPeriod" placeholder="1" min="1" max="12" required class="w-full p-2 border rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Mata Pelajaran</label>
-                            <input type="text" id="schedSubject" placeholder="Misal: Matematika" required class="w-full p-2 border rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Jam Mulai</label>
-                            <input type="time" id="schedStartTime" required class="w-full p-2 border rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Jam Selesai</label>
-                            <input type="time" id="schedEndTime" required class="w-full p-2 border rounded text-xs">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded text-xs font-bold hover:bg-indigo-700">+ Simpan Jam Mapel</button>
-                        </div>
-                    </form>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100 border-b">
-                                    <th class="p-2">Jam Ke</th>
-                                    <th class="p-2">Mata Pelajaran</th>
-                                    <th class="p-2">Waktu Pelajaran</th>
-                                    <th class="p-2">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="scheduleTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 2. REKAP CEKLOK SISWA PER JAM PELAJARAN (MATRIKS) -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="font-bold text-slate-700 flex items-center gap-2">
-                            <span>📌</span> Matriks Absensi GPS Siswa Per Jam Pelajaran
-                        </h4>
-                        <span id="currentDateLabel" class="text-xs font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-600"></span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse border">
-                            <thead id="matrixHeader" class="bg-slate-100 border-b"></thead>
-                            <tbody id="matrixBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 3. PEMBINAAN SISWA -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
-                    <div class="flex justify-between items-center flex-wrap gap-2 border-b pb-2">
-                        <h4 class="font-bold text-slate-700 flex items-center gap-2">
-                            <span>🎯</span> Pengelompokan Pembinaan Siswa
-                        </h4>
-                        <button onclick="downloadCoachingRecap()" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-indigo-700 shadow-sm">
-                            📥 Unduh Data Pembinaan (CSV)
-                        </button>
-                    </div>
-
-                    <form onsubmit="saveCoachingData(event)" class="bg-slate-50 p-4 rounded-xl border space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Pilih Siswa</label>
-                                <select id="coachStudentSelect" required class="w-full p-2 border rounded bg-white text-xs"></select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Kategori Pembinaan</label>
-                                <select id="coachCategory" required class="w-full p-2 border rounded bg-white text-xs">
-                                    <option value="Khusus">⚠️ Pembinaan Khusus (Perilaku/Akademik)</option>
-                                    <option value="Prestasi">⭐ Pembinaan Prestasi (Lomba/Talenta)</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Catatan / Target Pembinaan</label>
-                                <input type="text" id="coachNotes" placeholder="Catatan Bimbingan / Target Lomba" required class="w-full p-2 border rounded text-xs">
-                            </div>
-                        </div>
-                        <button type="submit" class="bg-indigo-600 text-white text-xs px-4 py-2 rounded font-bold hover:bg-indigo-700">
-                            + Simpan Data Pembinaan
-                        </button>
-                    </form>
-
-                    <div class="space-y-2">
-                        <h5 class="text-xs font-bold text-rose-700">⚠️ Kelompok Siswa Pembinaan Khusus</h5>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-rose-50 text-rose-900 border-b">
-                                        <th class="p-2">Nama Siswa</th>
-                                        <th class="p-2">Catatan Pembinaan</th>
-                                        <th class="p-2">Tanggal Update</th>
-                                        <th class="p-2">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="specialCoachingTableBody" class="divide-y"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2 pt-2">
-                        <h5 class="text-xs font-bold text-emerald-700">⭐ Kelompok Siswa Pembinaan Prestasi</h5>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-emerald-50 text-emerald-900 border-b">
-                                        <th class="p-2">Nama Siswa</th>
-                                        <th class="p-2">Target Prestasi</th>
-                                        <th class="p-2">Tanggal Update</th>
-                                        <th class="p-2">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="achievementCoachingTableBody" class="divide-y"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. PENGATURAN GPS KELAS -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <h4 class="font-bold text-slate-700 flex items-center gap-2">📍 Pengaturan Titik GPS Kelas</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                        <input type="text" id="classLat" placeholder="Latitude" class="p-2 border rounded">
-                        <input type="text" id="classLng" placeholder="Longitude" class="p-2 border rounded">
-                        <button onclick="setCurrentLocationAsClass()" class="bg-sky-600 text-white px-3 py-2 rounded text-xs font-semibold hover:bg-sky-700">🎯 Ambil Lokasi Saya Sekarang</button>
-                    </div>
-                    <button onclick="saveClassCoordinates()" class="bg-emerald-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-emerald-700">Simpan Titik Kelas</button>
-                </div>
-
-                <!-- 5. BUAT AKUN SISWA & AGENDA KUNJUNGAN RUMAH -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                        <h4 class="font-bold text-slate-700">➕ Buat Akun Siswa / Ortu</h4>
-                        <form onsubmit="createStudentAccount(event)" class="space-y-3">
-                            <input type="text" id="studentName" placeholder="Nama Lengkap" required class="w-full p-2 border rounded text-sm">
-                            <input type="text" id="studentUsername" placeholder="Username / NIS" required class="w-full p-2 border rounded text-sm">
-                            <input type="password" id="studentPassword" placeholder="Password" required class="w-full p-2 border rounded text-sm">
-                            <select id="userRoleType" class="w-full p-2 border rounded text-sm bg-white">
-                                <option value="Siswa">Siswa / Murid</option>
-                                <option value="Orang Tua">Orang Tua</option>
-                            </select>
-                            <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded text-sm font-medium hover:bg-emerald-700">+ Buat Akun Baru</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                        <h4 class="font-bold text-slate-700">🏠 Agendakan Kunjungan Rumah</h4>
-                        <form onsubmit="createHomeVisit(event)" class="space-y-3">
-                            <input type="text" id="visitStudentName" placeholder="Nama Siswa" required class="w-full p-2 border rounded text-sm">
-                            <input type="date" id="visitDate" required class="w-full p-2 border rounded text-sm">
-                            <textarea id="visitAgenda" placeholder="Agenda Kunjungan" required class="w-full p-2 border rounded text-sm h-16"></textarea>
-                            <button type="submit" class="w-full bg-amber-600 text-white py-2 rounded text-sm font-medium hover:bg-amber-700">+ Tambah Agenda Kunjungan</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- 6. TABEL AGENDA KUNJUNGAN RUMAH (HOME VISIT) -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="font-bold text-slate-700 flex items-center gap-2">
-                            <span>📅</span> Rekap Agenda Kunjungan Rumah (Home Visit)
-                        </h4>
-                        <button onclick="downloadVisitRecap()" class="bg-amber-600 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-amber-700 shadow-sm">
-                            📥 Unduh Rekap Kunjungan (CSV)
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="bg-slate-50 border-b text-xs text-slate-500">
-                                    <th class="p-2">Tanggal</th>
-                                    <th class="p-2">Nama Siswa</th>
-                                    <th class="p-2">Kelas</th>
-                                    <th class="p-2">Agenda / Catatan</th>
-                                    <th class="p-2">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="homeVisitTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 7. REKAP PROFIL DATA SISWA -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="font-bold text-slate-700">📋 Rekap Profil Data Siswa</h4>
-                        <button onclick="downloadStudentRecap()" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-emerald-700 shadow-sm">
-                            📥 Unduh Rekap Siswa (CSV)
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100 border-b">
-                                    <th class="p-2">Nama</th>
-                                    <th class="p-2">No. HP (Klik WA)</th>
-                                    <th class="p-2">WA Ortu (Klik WA)</th>
-                                    <th class="p-2">Alamat</th>
-                                    <th class="p-2">Tinggal Bersama</th>
-                                    <th class="p-2">Orang Tua</th>
-                                    <th class="p-2">Hobi / Kegiatan / Suka</th>
-                                    <th class="p-2">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentProfileTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 8. REKAP PROFIL DATA ORANG TUA -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="font-bold text-slate-700">📋 Rekap Profil Data Orang Tua</h4>
-                        <button onclick="downloadParentRecap()" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-emerald-700 shadow-sm">
-                            📥 Unduh Rekap Ortu (CSV)
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100 border-b">
-                                    <th class="p-2">Nama Ortu</th>
-                                    <th class="p-2">Nama Siswa (Anak)</th>
-                                    <th class="p-2">No. HP / WA (Klik WA)</th>
-                                    <th class="p-2">Pekerjaan & Penghasilan</th>
-                                    <th class="p-2">Alamat</th>
-                                    <th class="p-2">Sifat, Karakter & Pergaulan</th>
-                                    <th class="p-2">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="parentProfileTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 9. REKAP SURAT IZIN -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <div class="flex justify-between items-center flex-wrap gap-2">
-                        <h4 class="font-bold text-slate-700">📩 Rekap Surat Izin Tidak Masuk Sekolah</h4>
-                        <button onclick="downloadPermissionRecap()" class="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded font-semibold hover:bg-emerald-700 shadow-sm">
-                            📥 Unduh Rekap Surat Izin (CSV)
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100 border-b">
-                                    <th class="p-2">Tgl Pengajuan</th>
-                                    <th class="p-2">Nama Siswa</th>
-                                    <th class="p-2">Orang Tua</th>
-                                    <th class="p-2">Kategori</th>
-                                    <th class="p-2">Keterangan</th>
-                                    <th class="p-2">Dokumen Surat</th>
-                                    <th class="p-2">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="permissionTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- PANEL SISWA (CEKLOK GPS, CETAK KARTU, PROFIL) -->
-            <div id="studentFormPanel" class="hidden space-y-6">
-                
-                <!-- FITUR BARU: CETAK KARTU PELAJAR DIGITAL LENGKAP -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
-                    <h4 class="font-bold text-slate-700 border-b pb-2 flex items-center gap-2 no-print">
-                        <span>🪪</span> Cetak Kartu Pelajar Digital
-                    </h4>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                        <!-- Form Isian Data Kartu Pelajar -->
-                        <div class="space-y-3 no-print bg-slate-50 p-4 rounded-xl border">
-                            <h5 class="text-xs font-bold text-indigo-800 uppercase tracking-wide mb-2">Isi Data Kartu Pelajar</h5>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Sekolah</label>
-                                <input type="text" id="cardSchoolNameInput" placeholder="Misal: SMA Negeri 1 Jakarta" oninput="updateCardPreview()" class="w-full p-2 border rounded text-xs bg-white">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">NIS / NISN</label>
-                                    <input type="text" id="cardNisInput" placeholder="12345678" oninput="updateCardPreview()" class="w-full p-2 border rounded text-xs bg-white">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jurusan / Keahlian</label>
-                                    <input type="text" id="cardMajorInput" placeholder="IPA / IPS / RPL" oninput="updateCardPreview()" class="w-full p-2 border rounded text-xs bg-white">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Kepala Sekolah</label>
-                                <input type="text" id="cardPrincipalInput" placeholder="Dr. H. Ahmad, M.Pd" oninput="updateCardPreview()" class="w-full p-2 border rounded text-xs bg-white">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pas Foto Formal (Format Gambar)</label>
-                                <input type="file" id="studentPhotoInput" accept="image/*" onchange="handlePhotoUpload(event)" class="w-full p-1.5 border rounded text-xs bg-white">
-                            </div>
-                            <button onclick="printStudentCard()" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold text-xs hover:bg-indigo-700 flex items-center justify-center gap-2 shadow-md">
-                                🖨️ Cetak / Download Kartu Pelajar
-                            </button>
-                        </div>
-
-                        <!-- Preview Kartu Pelajar Cetak -->
-                        <div class="flex justify-center">
-                            <div id="printableCard" class="w-96 bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-5 shadow-2xl border border-indigo-400/40 relative overflow-hidden flex flex-col justify-between">
-                                <div>
-                                    <!-- Header Sekolah -->
-                                    <div class="text-center border-b border-indigo-400/40 pb-2 mb-3">
-                                        <h5 id="cardSchoolName" class="text-xs font-black uppercase tracking-wider text-indigo-200 truncate">SMA NEGERI 1 JAKARTA</h5>
-                                        <h6 class="text-[9px] font-extrabold uppercase tracking-widest text-indigo-300">KARTU TANDA PELAJAR</h6>
-                                    </div>
-
-                                    <!-- Badan Kartu: Foto & Detail -->
-                                    <div class="flex gap-3 items-center">
-                                        <div class="w-20 h-28 bg-indigo-950/80 border-2 border-indigo-300/60 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
-                                            <img id="cardPhotoPreview" src="https://via.placeholder.com/150?text=Foto" alt="Pas Foto" class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="space-y-1.5 text-[11px] leading-tight flex-1 min-w-0">
-                                            <div>
-                                                <span class="text-[8px] text-indigo-300 uppercase block font-semibold">Nama Lengkap</span>
-                                                <span id="cardStudentName" class="font-bold text-white text-xs block truncate">Nama Murid</span>
-                                            </div>
-                                            <div>
-                                                <span class="text-[8px] text-indigo-300 uppercase block font-semibold">NIS / ID</span>
-                                                <span id="cardStudentNIS" class="font-semibold text-slate-200 block">12345678</span>
-                                            </div>
-                                            <div class="grid grid-cols-2 gap-1">
-                                                <div>
-                                                    <span class="text-[8px] text-indigo-300 uppercase block font-semibold">Jurusan</span>
-                                                    <span id="cardStudentMajor" class="font-semibold text-slate-200 block truncate">IPA</span>
-                                                </div>
-                                                <div>
-                                                    <span class="text-[8px] text-indigo-300 uppercase block font-semibold">Kelas</span>
-                                                    <span id="cardStudentClass" class="font-semibold text-slate-200 block">7A</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Footer Tanda Tangan Kepala Sekolah -->
-                                <div class="mt-4 pt-2 border-t border-indigo-400/30 flex justify-between items-end">
-                                    <div class="text-[8px] text-indigo-300 space-y-0.5">
-                                        <span class="block">Status: <strong class="text-emerald-400">AKTIF</strong></span>
-                                        <span class="bg-indigo-950/80 px-1.5 py-0.5 rounded text-slate-300 font-mono text-[8px] border border-indigo-500/30 inline-block">*SI-WALI*</span>
-                                    </div>
-                                    
-                                    <!-- Area TTD Kepala Sekolah -->
-                                    <div class="text-center space-y-0.5">
-                                        <span class="text-[8px] text-indigo-200 block">Mengetahui,</span>
-                                        <span class="text-[7px] text-indigo-300 block">Kepala Sekolah</span>
-                                        <!-- Simulasi Stempel/TTD -->
-                                        <div class="h-6 flex items-center justify-center italic text-[9px] text-indigo-400 opacity-80 font-serif">
-                                            [ Tanda Tangan ]
-                                        </div>
-                                        <span id="cardPrincipalName" class="text-[9px] font-bold text-white block underline decoration-indigo-400">Dr. H. Ahmad, M.Pd</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CEKLOK GPS PER JAM PELAJARAN -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4 no-print">
-                    <h4 class="font-bold text-slate-700 border-b pb-2 flex items-center gap-2">📍 Ceklok GPS Absensi Per Jam Pelajaran</h4>
-                    <div class="p-4 bg-slate-50 border rounded-xl space-y-3">
-                        <select id="studentPeriodSelect" class="w-full p-2 border rounded bg-white text-xs font-bold text-indigo-700"></select>
-                        <button onclick="checkStudentLocation()" class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold text-xs hover:bg-sky-700">📡 1. Ambil Lokasi GPS Saya</button>
-                        <div id="gpsStatus" class="text-xs font-semibold text-center text-slate-500">Status GPS: Belum Diambil</div>
-                        <button id="btnMarkPresent" disabled onclick="submitAttendance('Hadir')" class="w-full bg-slate-300 text-slate-500 py-2.5 rounded-lg font-bold text-sm cursor-not-allowed">✅ 2. Klik Ceklok Hadir</button>
-                    </div>
-                </div>
-
-                <!-- FORM ISIAN PROFIL SISWA -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4 no-print">
-                    <h4 class="font-bold text-slate-700 border-b pb-2">📝 Form Isian Profil Siswa</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <input type="text" id="sPhone" placeholder="Nomor HP Siswa" class="p-2 border rounded">
-                        <input type="text" id="sParentPhone" placeholder="Nomor WA Orang Tua" class="p-2 border rounded">
-                        <input type="text" id="sAddress" placeholder="Alamat Rumah Lengkap" class="p-2 border rounded">
-                        <input type="text" id="sLiveWith" placeholder="Tinggal Bersama Siapa?" class="p-2 border rounded">
-                        <input type="text" id="sFather" placeholder="Nama Ayah" class="p-2 border rounded">
-                        <input type="text" id="sMother" placeholder="Nama Ibu" class="p-2 border rounded">
-                        <input type="text" id="sHobby" placeholder="Hobi" class="p-2 border rounded">
-                        <input type="text" id="sActivity" placeholder="Kegiatan Harian" class="p-2 border rounded">
-                        <input type="text" id="sFavorite" placeholder="Kesukaan / Favorit" class="p-2 border rounded">
-                    </div>
-                    <button onclick="saveStudentData()" class="bg-emerald-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-emerald-700">Simpan Profil Saya</button>
-                </div>
-            </div>
-
-            <!-- PANEL ORANG TUA (INFORMASI, SURAT IZIN & PROFIL) -->
-            <div id="parentFormPanel" class="hidden space-y-6 no-print">
-
-                <div id="parentCoachingCard" class="hidden bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <h4 class="font-bold text-slate-700 border-b pb-2">🎯 Catatan Pembinaan Anak dari Wali Kelas</h4>
-                    <div id="parentCoachingContent" class="text-xs"></div>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                    <h4 class="font-bold text-slate-700 border-b pb-2">🏠 Riwayat Kunjungan Rumah dari Wali Kelas</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100 border-b">
-                                    <th class="p-2">Tanggal</th>
-                                    <th class="p-2">Nama Anak</th>
-                                    <th class="p-2">Agenda / Catatan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="parentHomeVisitTableBody" class="divide-y"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
-                    <h4 class="font-bold text-slate-700 border-b pb-2">✉️ Buat & Unggah Surat Izin Tidak Masuk Sekolah</h4>
-                    <form onsubmit="submitPermissionLetter(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <input type="text" id="permStudentName" required placeholder="Nama Siswa (Anak)" class="p-2 border rounded">
-                        <input type="date" id="permDate" required class="p-2 border rounded">
-                        <select id="permReason" class="p-2 border rounded bg-white">
-                            <option value="Sakit">Sakit</option>
-                            <option value="Izin / Acara Keluarga">Izin / Acara Keluarga</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                        <input type="file" id="permFile" accept="image/*,.pdf" class="p-1.5 border rounded text-xs bg-slate-50">
-                        <textarea id="permNotes" placeholder="Catatan Alasan Lengkap..." class="p-2 border rounded h-20 md:col-span-2"></textarea>
-                        <button type="submit" class="md:col-span-2 bg-indigo-600 text-white py-2 rounded font-medium hover:bg-indigo-700">📤 Kirim Surat Izin</button>
-                    </form>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4">
-                    <h4 class="font-bold text-slate-700 border-b pb-2">👨‍👩‍👧 Form Isian Profil Orang Tua</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <input type="text" id="pChildName" placeholder="Nama Siswa (Anak)" class="p-2 border rounded">
-                        <input type="text" id="pPhone" placeholder="Nomor HP / WhatsApp" class="p-2 border rounded">
-                        <input type="text" id="pJob" placeholder="Pekerjaan" class="p-2 border rounded">
-                        <input type="text" id="pIncome" placeholder="Penghasilan Bulanan" class="p-2 border rounded">
-                        <input type="text" id="pAddress" placeholder="Alamat Rumah Lengkap" class="p-2 border rounded md:col-span-2">
-                        <textarea id="pTrait" placeholder="Sifat Anak" class="p-2 border rounded h-20"></textarea>
-                        <textarea id="pCharacter" placeholder="Karakter Anak" class="p-2 border rounded h-20"></textarea>
-                        <textarea id="pSocial" placeholder="Pergaulan Anak" class="p-2 border rounded h-20 md:col-span-2"></textarea>
-                    </div>
-                    <button onclick="saveParentData()" class="bg-emerald-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-emerald-700">Simpan Profil Saya</button>
-                </div>
-
-            </div>
-
-            <!-- DISKUSI KELAS -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border space-y-4 no-print">
-                <h4 class="font-bold text-slate-700">💬 Kolom Diskusi Kelas</h4>
-                <div class="flex gap-2">
-                    <input type="text" id="chatMessage" placeholder="Tulis pesan..." class="flex-1 p-2 border rounded text-sm">
-                    <button onclick="sendChatMessage()" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-medium">Kirim</button>
-                </div>
-                <div id="chatContainer" class="space-y-3 max-h-80 overflow-y-auto"></div>
-            </div>
-
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">Password</label>
+          <input type="password" id="loginPass" placeholder="Masukkan password" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
         </div>
+        <button type="submit" id="btnLogin" class="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
+          <i class="fa-solid fa-sign-in-alt mr-2"></i> Login Masuk
+        </button>
+      </form>
 
-    </main>
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+        <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-semibold">Atau</span></div>
+      </div>
 
-    <!-- LOGIKA SISTEM INTEGRASI LENGKAP -->
-    <script>
-        let db = JSON.parse(localStorage.getItem('si_wali_db_master')) || {
-            users: [
-                { id: 1, name: 'Super Admin Pusat', username: 'admin', password: 'admin123', role: 'superadmin', className: 'Pusat' }
-            ],
-            classCoords: {},
-            schedules: [],
-            attendances: [],
-            homeVisits: [],
-            coachings: [],
-            permissions: [],
-            discussions: []
-        };
+      <button onclick="showRegister()" class="w-full bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition">
+        <i class="fa-solid fa-user-plus mr-2"></i> Pendaftaran Siswa Baru (Mandiri)
+      </button>
+    </div>
 
-        let currentSession = null;
-        let studentDistance = null;
+    <!-- FORM REGISTRASI SISWA MANDIRI -->
+    <div id="registerSection" class="hidden bg-white p-6 md:p-8 rounded-2xl shadow-xl my-6 border border-slate-200">
+      <div class="border-b pb-4 mb-6 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-emerald-600"><i class="fa-solid fa-id-card mr-2"></i>Pendaftaran Siswa Baru</h2>
+          <p class="text-xs text-slate-500">Isi data profil dengan benar dari HP Anda</p>
+        </div>
+        <button onclick="showLogin()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
 
-        function saveDB() { localStorage.setItem('si_wali_db_master', JSON.stringify(db)); }
+      <form id="regForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">NISN (Digunakan sebagai Username)</label>
+          <input type="text" id="regNisn" placeholder="Nomor NISN" class="w-full p-3 border rounded-xl" required>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">Password Akun</label>
+          <input type="password" id="regPass" placeholder="Password Akun" class="w-full p-3 border rounded-xl" required>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">Nama Lengkap Siswa</label>
+          <input type="text" id="regNama" placeholder="Nama Lengkap" class="w-full p-3 border rounded-xl" required>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">Kelas</label>
+          <input type="text" id="regKelas" placeholder="Contoh: IX-A" class="w-full p-3 border rounded-xl" required>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">No. HP / WhatsApp Siswa</label>
+          <input type="text" id="regHp" placeholder="08xxxxxxxxxx" class="w-full p-3 border rounded-xl" required>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">Nama Orang Tua / Wali</label>
+          <input type="text" id="regOrtu" placeholder="Nama Ayah/Ibu/Wali" class="w-full p-3 border rounded-xl" required>
+        </div>
+        <div class="col-span-1 md:col-span-2">
+          <label class="text-xs font-bold text-slate-600 block mb-1">URL Foto Profil (Pas Foto Online / Link Drive)</label>
+          <input type="url" id="regFoto" placeholder="https://..." class="w-full p-3 border rounded-xl">
+        </div>
+        <div class="col-span-1 md:col-span-2">
+          <label class="text-xs font-bold text-slate-600 block mb-1">Alamat Rumah Lengkap</label>
+          <textarea id="regAlamat" placeholder="Alamat Tempat Tinggal Lengkap" class="w-full p-3 border rounded-xl" rows="2" required></textarea>
+        </div>
+        <button type="submit" id="btnReg" class="col-span-1 md:col-span-2 bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700 shadow-md">
+          <i class="fa-solid fa-save mr-2"></i> Simpan Profil & Buat Akun
+        </button>
+      </form>
+    </div>
 
-        function formatWAButton(phone, textMsg) {
-            if (!phone) return '<span class="text-slate-400 font-normal">-</span>';
-            let cleaned = phone.replace(/[^0-9]/g, '');
-            if (cleaned.startsWith('0')) cleaned = '62' + cleaned.slice(1);
-            let url = `https://wa.me/${cleaned}`;
-            if(textMsg) url += `?text=${encodeURIComponent(textMsg)}`;
-            return `<a href="${url}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-500 text-white px-2 py-1 rounded text-[11px] font-semibold hover:bg-emerald-600">📱 ${phone}</a>`;
+    <!-- DASHBOARD ADMIN -->
+    <div id="adminDashboard" class="hidden space-y-6">
+      <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-amber-900"><i class="fa-solid fa-database mr-2"></i>Inisialisasi Database</h3>
+          <p class="text-xs text-amber-700">Gunakan tombol ini untuk membuat header tabel Google Sheet secara otomatis jika spreadsheet masih kosong.</p>
+        </div>
+        <button onclick="initDatabase()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2.5 rounded-xl shadow text-sm whitespace-nowrap">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Setup Tabel Otomatis
+        </button>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-xl font-bold mb-4 text-indigo-700"><i class="fa-solid fa-user-gear mr-2"></i>Buat Akun Wali Kelas</h3>
+        <form id="formWali" class="space-y-4">
+          <input type="text" id="waliNama" placeholder="Nama Lengkap Wali Kelas & Gelar" class="w-full p-3 border rounded-xl" required>
+          <input type="text" id="waliUser" placeholder="Username Wali Kelas" class="w-full p-3 border rounded-xl" required>
+          <input type="password" id="waliPass" placeholder="Password Akun" class="w-full p-3 border rounded-xl" required>
+          <button type="submit" class="bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700">
+            <i class="fa-solid fa-plus-circle mr-2"></i> Buat Akun Wali Kelas
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- DASHBOARD WALI KELAS -->
+    <div id="waliDashboard" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-lg font-bold mb-4 text-indigo-700"><i class="fa-solid fa-bullhorn mr-2"></i>Terbitkan Pengumuman Kelas</h3>
+        <form id="formPengumuman" class="space-y-4">
+          <input type="text" id="pJudul" placeholder="Judul Pengumuman" class="w-full p-3 border rounded-xl" required>
+          <textarea id="pIsi" placeholder="Tuliskan detail informasi pengumuman di sini..." class="w-full p-3 border rounded-xl" rows="3" required></textarea>
+          <button type="submit" class="bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700">
+            <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Pengumuman
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-lg font-bold mb-4 text-emerald-700"><i class="fa-solid fa-house-user mr-2"></i>Rekap Kunjungan Rumah (Home Visit)</h3>
+        <form id="formKunjungan" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="text" id="kujNisn" placeholder="NISN Siswa" class="p-3 border rounded-xl" required>
+          <input type="text" id="kujNama" placeholder="Nama Siswa" class="p-3 border rounded-xl" required>
+          <textarea id="kujCatatan" placeholder="Hasil/Catatan Kunjungan Rumah" class="p-3 border rounded-xl col-span-1 md:col-span-2" rows="2" required></textarea>
+          <button type="submit" class="col-span-1 md:col-span-2 bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700">
+            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Rekap Kunjungan
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fa-solid fa-users mr-2"></i>Data Siswa Terdaftar</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-left text-sm">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 border-b">
+                <th class="p-3">NISN</th>
+                <th class="p-3">Nama</th>
+                <th class="p-3">Kelas</th>
+                <th class="p-3">No. HP</th>
+                <th class="p-3">Orang Tua</th>
+              </tr>
+            </thead>
+            <tbody id="tabelSiswa" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SISWA -->
+    <div id="siswaDashboard" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-blue-700 to-indigo-900 text-white p-6 rounded-2xl shadow-2xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 relative z-10">
+          <img id="cardFoto" src="https://via.placeholder.com/150" alt="Foto Siswa" class="w-28 h-36 rounded-xl border-4 border-white/30 object-cover shadow-lg bg-slate-200">
+          <div class="text-center sm:text-left">
+            <span class="bg-amber-400 text-slate-900 font-extrabold text-[10px] px-2.5 py-1 rounded-md tracking-wider">KARTU PELAJAR DIGITAL</span>
+            <h2 id="cardNama" class="text-2xl font-bold mt-2">-[Nama Siswa]-</h2>
+            <p id="cardNisn" class="text-sm text-indigo-200 mt-1">NISN: -</p>
+            <p id="cardKelas" class="text-sm text-indigo-200">Kelas: -</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-lg font-bold mb-4 text-indigo-700"><i class="fa-solid fa-bullhorn mr-2"></i>Pengumuman Wali Kelas</h3>
+        <div id="pengumumanList" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD ORANG TUA -->
+    <div id="ortuDashboard" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-lg font-bold mb-4 text-indigo-700"><i class="fa-solid fa-envelope-open-text mr-2"></i>Form Pengajuan Surat Izin Siswa</h3>
+        <form id="formIzin" class="space-y-4">
+          <input type="text" id="izNisn" placeholder="NISN Putra/Putri" class="w-full p-3 border rounded-xl" required>
+          <input type="text" id="izNama" placeholder="Nama Lengkap Siswa" class="w-full p-3 border rounded-xl" required>
+          <textarea id="izKet" placeholder="Alasan Tidak Masuk (Sakit / Izin Acara Keluarga)" class="w-full p-3 border rounded-xl" rows="3" required></textarea>
+          <button type="submit" class="bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700">
+            <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Surat Izin
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+        <h3 class="text-lg font-bold mb-4 text-slate-800"><i class="fa-solid fa-bullhorn mr-2"></i>Pengumuman Sekolah & Wali Kelas</h3>
+        <div id="pengumumanOrtuList" class="space-y-3"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // URL BACKEND GOOGLE APP SCRIPT
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjZX4j_Pm0TH9b-wixk8Veex7MaelJzY3ha4dla0MkWEvftmJW7Ii4jCerpNVL1hMd6w/exec";
+    let currentUser = null;
+
+    // FUNGSI KOMUNIKASI API BACKEND (POST FETCH)
+    async function callBackend(action, payload = {}) {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, data: payload })
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Error Backend:', error);
+        return { success: false, message: 'Gagal terhubung ke Google Spreadsheet!' };
+      }
+    }
+
+    function showLogin() {
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('registerSection').classList.add('hidden');
+    }
+
+    function showRegister() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('registerSection').classList.remove('hidden');
+    }
+
+    function logout() {
+      location.reload();
+    }
+
+    // LOGIN SYSTEM
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnLogin');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses...';
+      btn.disabled = true;
+
+      const data = {
+        username: document.getElementById('loginUser').value,
+        password: document.getElementById('loginPass').value
+      };
+      
+      const res = await callBackend('login', data);
+      btn.innerHTML = '<i class="fa-solid fa-sign-in-alt mr-2"></i> Login Masuk';
+      btn.disabled = false;
+
+      if(res.success) {
+        currentUser = res;
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('userBadge').classList.remove('hidden');
+        document.getElementById('userInfo').innerText = `${res.nama} (${res.role.toUpperCase()})`;
+        loadDashboard(res);
+      } else {
+        alert(res.message);
+      }
+    });
+
+    // REGISTRASI SISWA MANDIRI
+    document.getElementById('regForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnReg');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...';
+      btn.disabled = true;
+
+      const data = {
+        nisn: document.getElementById('regNisn').value,
+        username: document.getElementById('regNisn').value,
+        password: document.getElementById('regPass').value,
+        nama: document.getElementById('regNama').value,
+        kelas: document.getElementById('regKelas').value,
+        hp: document.getElementById('regHp').value,
+        namaOrtu: document.getElementById('regOrtu').value,
+        alamat: document.getElementById('regAlamat').value,
+        fotoUrl: document.getElementById('regFoto').value
+      };
+      
+      const res = await callBackend('registerSiswa', data);
+      btn.innerHTML = '<i class="fa-solid fa-save mr-2"></i> Simpan Profil & Buat Akun';
+      btn.disabled = false;
+      alert(res.message);
+      if(res.success) showLogin();
+    });
+
+    // LOAD DASHBOARD DATA
+    async function loadDashboard(user) {
+      const data = await callBackend('getDashboardData', {});
+      
+      if(user.role === 'admin') {
+        document.getElementById('adminDashboard').classList.remove('hidden');
+      } 
+      else if(user.role === 'walikelas') {
+        document.getElementById('waliDashboard').classList.remove('hidden');
+        
+        const tbody = document.getElementById('tabelSiswa');
+        tbody.innerHTML = '';
+        if(data.siswa && data.siswa.length > 1) {
+          data.siswa.slice(1).forEach(row => {
+            tbody.innerHTML += `<tr class="hover:bg-slate-50">
+              <td class="p-3 border-b font-mono text-xs">${row[0]}</td>
+              <td class="p-3 border-b font-bold text-slate-800">${row[1]}</td>
+              <td class="p-3 border-b">${row[2]}</td>
+              <td class="p-3 border-b">${row[4]}</td>
+              <td class="p-3 border-b">${row[5]}</td>
+            </tr>`;
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada data siswa mendaftar</td></tr>';
         }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('loginUsername').value.trim();
-            const p = document.getElementById('loginPassword').value.trim();
-            const foundUser = db.users.find(user => user.username === u && user.password === p);
-
-            if (foundUser) {
-                currentSession = foundUser;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('dashboardSection').classList.remove('hidden');
-                renderDashboard();
-            } else { alert('Username atau password salah!'); }
+      } 
+      else if(user.role === 'siswa') {
+        document.getElementById('siswaDashboard').classList.remove('hidden');
+        
+        if(data.siswa) {
+          const siswaData = data.siswa.find(s => String(s[0]) === String(user.nisn));
+          if(siswaData) {
+            document.getElementById('cardNama').innerText = siswaData[1];
+            document.getElementById('cardNisn').innerText = 'NISN: ' + siswaData[0];
+            document.getElementById('cardKelas').innerText = 'Kelas: ' + siswaData[2];
+            if(siswaData[6]) document.getElementById('cardFoto').src = siswaData[6];
+          }
         }
-
-        function logout() {
-            currentSession = null;
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('dashboardSection').classList.add('hidden');
-        }
-
-        function renderDashboard() {
-            const header = document.getElementById('userInfoHeader');
-            header.innerText = `${currentSession.name} (${currentSession.role.toUpperCase()})`;
-            header.classList.remove('hidden');
-            document.getElementById('sessionDetail').innerText = `${currentSession.name} | Peran: ${currentSession.role} | Kelas: ${currentSession.className}`;
-
-            document.getElementById('superadminPanel').classList.add('hidden');
-            document.getElementById('teacherPanel').classList.add('hidden');
-            document.getElementById('studentFormPanel').classList.add('hidden');
-            document.getElementById('parentFormPanel').classList.add('hidden');
-
-            if (currentSession.role === 'superadmin') {
-                document.getElementById('superadminPanel').classList.remove('hidden');
-                renderTeacherList();
-            } else if (currentSession.role === 'walikelas') {
-                document.getElementById('teacherPanel').classList.remove('hidden');
-                document.getElementById('teacherClassName').innerText = currentSession.className;
-                document.getElementById('currentDateLabel').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                
-                loadClassCoordinates();
-                renderScheduleTable();
-                renderAttendanceMatrix();
-                renderStudentProfiles();
-                renderParentProfiles();
-                renderHomeVisits();
-                renderPermissions();
-                renderCoachingOptions();
-                renderCoachingTables();
-            } else if (currentSession.role === 'Siswa') {
-                document.getElementById('studentFormPanel').classList.remove('hidden');
-                renderStudentPeriodSelect();
-                loadStudentData();
-                loadStudentCardData();
-            } else if (currentSession.role === 'Orang Tua') {
-                document.getElementById('parentFormPanel').classList.remove('hidden');
-                loadParentData();
-                renderParentHomeVisits();
-                renderParentCoachingStatus();
-            }
-
-            renderDiscussions();
-        }
-
-        // KARTU PELAJAR LOGIC BARU
-        function loadStudentCardData() {
-            document.getElementById('cardStudentName').innerText = currentSession.name;
-            document.getElementById('cardStudentClass').innerText = currentSession.className || '-';
-            
-            // Set input values dari data sesi jika ada
-            document.getElementById('cardSchoolNameInput').value = currentSession.schoolName || 'SMA NEGERI 1 JAKARTA';
-            document.getElementById('cardNisInput').value = currentSession.nis || currentSession.username || '12345678';
-            document.getElementById('cardMajorInput').value = currentSession.major || 'IPA';
-            document.getElementById('cardPrincipalInput').value = currentSession.principalName || 'Dr. H. Ahmad, M.Pd';
-
-            if (currentSession.photo) {
-                document.getElementById('cardPhotoPreview').src = currentSession.photo;
-            }
-
-            updateCardPreview();
-        }
-
-        function updateCardPreview() {
-            const school = document.getElementById('cardSchoolNameInput').value || 'NAMA SEKOLAH';
-            const nis = document.getElementById('cardNisInput').value || '-';
-            const major = document.getElementById('cardMajorInput').value || '-';
-            const principal = document.getElementById('cardPrincipalInput').value || '-';
-
-            document.getElementById('cardSchoolName').innerText = school;
-            document.getElementById('cardStudentNIS').innerText = nis;
-            document.getElementById('cardStudentMajor').innerText = major;
-            document.getElementById('cardPrincipalName').innerText = principal;
-
-            // Simpan perubahan ke LocalStorage
-            const idx = db.users.findIndex(u => u.id === currentSession.id);
-            if (idx !== -1) {
-                db.users[idx].schoolName = school;
-                db.users[idx].nis = nis;
-                db.users[idx].major = major;
-                db.users[idx].principalName = principal;
-                currentSession = db.users[idx];
-                saveDB();
-            }
-        }
-
-        function handlePhotoUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const photoBase64 = event.target.result;
-                    document.getElementById('cardPhotoPreview').src = photoBase64;
-                    const idx = db.users.findIndex(u => u.id === currentSession.id);
-                    if (idx !== -1) {
-                        db.users[idx].photo = photoBase64;
-                        currentSession.photo = photoBase64;
-                        saveDB();
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function printStudentCard() { window.print(); }
-
-        // JADWAL & MATRIKS ABSENSI
-        function saveSchedule(e) {
-            e.preventDefault();
-            const period = parseInt(document.getElementById('schedPeriod').value);
-            const subject = document.getElementById('schedSubject').value;
-            const startTime = document.getElementById('schedStartTime').value;
-            const endTime = document.getElementById('schedEndTime').value;
-
-            if (!db.schedules) db.schedules = [];
-            const existingIdx = db.schedules.findIndex(s => s.className === currentSession.className && s.period === period);
-            const record = { id: Date.now(), className: currentSession.className, period, subject, startTime, endTime };
-            
-            if (existingIdx !== -1) db.schedules[existingIdx] = record;
-            else db.schedules.push(record);
-
-            saveDB(); alert("✅ Jam Pelajaran Disimpan!");
-            renderScheduleTable(); renderAttendanceMatrix();
-        }
-
-        function renderScheduleTable() {
-            const tbody = document.getElementById('scheduleTableBody'); tbody.innerHTML = '';
-            const list = (db.schedules || []).filter(s => s.className === currentSession.className).sort((a,b) => a.period - b.period);
-            if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">Belum ada jam pelajaran.</td></tr>'; return; }
-            list.forEach(s => {
-                tbody.innerHTML += `<tr><td class="p-2 font-bold text-indigo-700">Jam Ke-${s.period}</td><td class="p-2 font-semibold">${s.subject}</td><td class="p-2">${s.startTime} - ${s.endTime}</td><td class="p-2"><button onclick="deleteSchedule(${s.id})" class="bg-rose-600 text-white px-2 py-0.5 rounded text-[10px]">Hapus</button></td></tr>`;
-            });
-        }
-
-        function deleteSchedule(id) {
-            if (confirm('Hapus slot jam pelajaran?')) {
-                db.schedules = db.schedules.filter(s => s.id !== id); saveDB(); renderScheduleTable(); renderAttendanceMatrix();
-            }
-        }
-
-        function renderStudentPeriodSelect() {
-            const select = document.getElementById('studentPeriodSelect'); select.innerHTML = '';
-            const list = (db.schedules || []).filter(s => s.className === currentSession.className).sort((a,b) => a.period - b.period);
-            if (list.length === 0) { select.innerHTML = '<option value="">-- Jadwal belum diatur --</option>'; return; }
-            list.forEach(s => { select.innerHTML += `<option value="${s.period}">Jam Ke-${s.period}: ${s.subject} (${s.startTime} - ${s.endTime})</option>`; });
-        }
-
-        function renderAttendanceMatrix() {
-            const header = document.getElementById('matrixHeader'); const body = document.getElementById('matrixBody');
-            header.innerHTML = ''; body.innerHTML = '';
-            const schedules = (db.schedules || []).filter(s => s.className === currentSession.className).sort((a,b) => a.period - b.period);
-            const students = db.users.filter(u => u.className === currentSession.className && u.role === 'Siswa');
-            const today = new Date().toISOString().split('T')[0];
-
-            if (schedules.length === 0 || students.length === 0) {
-                body.innerHTML = '<tr><td class="p-3 text-center text-slate-400">Atur jadwal pelajaran dan daftarkan siswa terlebih dahulu.</td></tr>'; return;
-            }
-
-            let headHtml = '<tr class="border-b"><th class="p-2 border">Nama Siswa</th>';
-            schedules.forEach(s => { headHtml += `<th class="p-2 text-center border">Jam ${s.period}<br><span class="font-normal text-[10px] text-slate-500">${s.subject}</span></th>`; });
-            headHtml += '<th class="p-2 text-center border">WA Ortu</th></tr>';
-            header.innerHTML = headHtml;
-
-            students.forEach(s => {
-                let rowHtml = `<tr class="border-b"><td class="p-2 font-bold border">${s.name}</td>`;
-                const parentUser = db.users.find(u => u.className === currentSession.className && u.role === 'Orang Tua' && u.pChildName === s.name);
-                const parentPhone = (parentUser && parentUser.pPhone) || s.sParentPhone || '';
-
-                schedules.forEach(sched => {
-                    const att = (db.attendances || []).find(a => a.studentId === s.id && a.date === today && a.period === sched.period);
-                    let badge = '<span class="text-slate-300 font-bold">-</span>';
-                    if (att) {
-                        if (att.status === 'Hadir') badge = '<span class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold text-[10px]">✅ Hadir</span>';
-                        else if (att.status === 'Bolos') badge = '<span class="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-bold text-[10px]">🚨 Bolos</span>';
-                    }
-                    rowHtml += `<td class="p-2 text-center border"><div class="space-y-1">${badge}<div class="flex justify-center gap-1"><button onclick="setStudentPeriodStatus(${s.id}, ${sched.period}, 'Hadir')" class="text-[9px] bg-emerald-500 text-white px-1 rounded">✓</button><button onclick="setStudentPeriodStatus(${s.id}, ${sched.period}, 'Bolos')" class="text-[9px] bg-rose-500 text-white px-1 rounded">✕</button></div></div></td>`;
-                });
-
-                const msgWA = `Yth. Orang Tua dari *${s.name}*,\nAnak Anda terdeteksi *BOLOS* pada jam pelajaran hari ini (${new Date().toLocaleDateString('id-ID')}). Mohon konfirmasi Wali Kelas.`;
-                rowHtml += `<td class="p-2 text-center border">${formatWAButton(parentPhone, msgWA)}</td></tr>`;
-                body.innerHTML += rowHtml;
-            });
-        }
-
-        function setStudentPeriodStatus(studentId, period, status) {
-            const today = new Date().toISOString().split('T')[0];
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const student = db.users.find(u => u.id === studentId);
-
-            if (!db.attendances) db.attendances = [];
-            const idx = db.attendances.findIndex(a => a.studentId === studentId && a.date === today && a.period === period);
-            const attData = { id: Date.now(), studentId, studentName: student.name, className: currentSession.className, date: today, period, status, time: timeNow, distance: null };
-
-            if (idx !== -1) db.attendances[idx] = attData;
-            else db.attendances.push(attData);
-
-            saveDB(); renderAttendanceMatrix();
-
-            if (status === 'Bolos') {
-                const parentUser = db.users.find(u => u.className === currentSession.className && u.role === 'Orang Tua' && u.pChildName === student.name);
-                const parentPhone = (parentUser && parentUser.pPhone) || student.sParentPhone || null;
-                if (parentPhone) {
-                    let cleaned = parentPhone.replace(/[^0-9]/g, '');
-                    if (cleaned.startsWith('0')) cleaned = '62' + cleaned.slice(1);
-                    const msg = `Yth. Orang Tua/Wali dari *${student.name}*,\nAnak Anda terdeteksi *BOLOS* pada Jam Ke-${period} hari ini.\nMohon konfirmasinya.\n- Wali Kelas ${currentSession.name}`;
-                    window.open(`https://wa.me/${cleaned}?text=${encodeURIComponent(msg)}`, '_blank');
-                }
-            }
-        }
-
-        // HAVERSINE & GPS
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3;
-            const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
-            const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
-            return Math.round(R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))));
-        }
-
-        function setCurrentLocationAsClass() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    document.getElementById('classLat').value = pos.coords.latitude;
-                    document.getElementById('classLng').value = pos.coords.longitude;
-                }, () => alert("Gagal mengambil GPS!"));
-            }
-        }
-
-        function saveClassCoordinates() {
-            const lat = parseFloat(document.getElementById('classLat').value);
-            const lng = parseFloat(document.getElementById('classLng').value);
-            if (!lat || !lng) return alert("Isi koordinat lengkap!");
-            if (!db.classCoords) db.classCoords = {};
-            db.classCoords[currentSession.className] = { lat, lng };
-            saveDB(); alert(`Titik lokasi kelas ${currentSession.className} disimpan!`);
-        }
-
-        function loadClassCoordinates() {
-            const coords = (db.classCoords && db.classCoords[currentSession.className]) || null;
-            if (coords) {
-                document.getElementById('classLat').value = coords.lat;
-                document.getElementById('classLng').value = coords.lng;
-            }
-        }
-
-        function checkStudentLocation() {
-            const statusDiv = document.getElementById('gpsStatus');
-            const btnPresent = document.getElementById('btnMarkPresent');
-            const classCoord = (db.classCoords && db.classCoords[currentSession.className]) || null;
-
-            if (!classCoord) {
-                statusDiv.className = "text-xs font-semibold text-center text-rose-600";
-                statusDiv.innerText = "❌ Wali Kelas belum menentukan titik koordinat GPS kelas!";
-                return;
-            }
-
-            if (navigator.geolocation) {
-                statusDiv.innerText = "🔄 Mendeteksi lokasi GPS Anda...";
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, classCoord.lat, classCoord.lng);
-                    studentDistance = dist;
-                    if (dist <= 50) {
-                        statusDiv.className = "text-xs font-bold text-center text-emerald-600";
-                        statusDiv.innerText = `✅ Lokasi Valid! Anda di kelas (Jarak: ${dist} Meter).`;
-                        btnPresent.disabled = false;
-                        btnPresent.className = "w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-700 shadow-md transition cursor-pointer";
-                    } else {
-                        statusDiv.className = "text-xs font-bold text-center text-rose-600";
-                        statusDiv.innerText = `❌ Di Luar Kelas! Jarak: ${dist} Meter (Maksimal 50M).`;
-                        btnPresent.disabled = true;
-                        btnPresent.className = "w-full bg-slate-300 text-slate-500 py-2.5 rounded-lg font-bold text-sm cursor-not-allowed";
-                    }
-                }, () => alert("Gagal mengambil GPS HP!"));
-            }
-        }
-
-        function submitAttendance(status) {
-            const period = parseInt(document.getElementById('studentPeriodSelect').value);
-            if (!period) return alert("Pilih jam pelajaran terlebih dahulu!");
-            const today = new Date().toISOString().split('T')[0];
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            if (!db.attendances) db.attendances = [];
-
-            const existingIdx = db.attendances.findIndex(a => a.studentId === currentSession.id && a.date === today && a.period === period);
-            const attendanceRecord = { id: Date.now(), studentId: currentSession.id, studentName: currentSession.name, className: currentSession.className, date: today, period: period, status: status, time: timeNow, distance: studentDistance };
-
-            if (existingIdx !== -1) db.attendances[existingIdx] = attendanceRecord;
-            else db.attendances.push(attendanceRecord);
-
-            saveDB(); alert(`✅ Ceklok Hadir Jam Ke-${period} Berhasil!`);
-        }
-
-        // PEMBINAAN SISWA
-        function renderCoachingOptions() {
-            const select = document.getElementById('coachStudentSelect'); select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
-            db.users.filter(u => u.className === currentSession.className && u.role === 'Siswa').forEach(s => { select.innerHTML += `<option value="${s.id}">${s.name}</option>`; });
-        }
-
-        function saveCoachingData(e) {
-            e.preventDefault();
-            const studentId = parseInt(document.getElementById('coachStudentSelect').value);
-            const category = document.getElementById('coachCategory').value;
-            const notes = document.getElementById('coachNotes').value;
-            const student = db.users.find(u => u.id === studentId);
-
-            if (!student) return alert("Pilih siswa!");
-            if (!db.coachings) db.coachings = [];
-
-            const existingIdx = db.coachings.findIndex(c => c.studentId === studentId && c.className === currentSession.className);
-            const record = { id: Date.now(), studentId, studentName: student.name, className: currentSession.className, category, notes, updatedAt: new Date().toLocaleDateString('id-ID') };
-
-            if (existingIdx !== -1) db.coachings[existingIdx] = record;
-            else db.coachings.push(record);
-
-            saveDB(); alert(`✅ Data Pembinaan Disimpan!`); renderCoachingTables(); document.getElementById('coachNotes').value = '';
-        }
-
-        function renderCoachingTables() {
-            const specialTbody = document.getElementById('specialCoachingTableBody');
-            const achievementTbody = document.getElementById('achievementCoachingTableBody');
-            specialTbody.innerHTML = ''; achievementTbody.innerHTML = '';
-
-            const list = (db.coachings || []).filter(c => c.className === currentSession.className);
-            const specialList = list.filter(c => c.category === 'Khusus');
-            const achievementList = list.filter(c => c.category === 'Prestasi');
-
-            if (specialList.length === 0) specialTbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-slate-400">Belum ada pembinaan khusus.</td></tr>';
-            else specialList.forEach(c => specialTbody.innerHTML += `<tr><td class="p-2 font-bold text-rose-900">${c.studentName}</td><td class="p-2">${c.notes}</td><td class="p-2 text-[10px] text-slate-500">${c.updatedAt}</td><td class="p-2"><button onclick="deleteCoaching(${c.id})" class="bg-rose-600 text-white px-2 py-0.5 rounded text-[10px]">Hapus</button></td></tr>`);
-
-            if (achievementList.length === 0) achievementTbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-slate-400">Belum ada pembinaan prestasi.</td></tr>';
-            else achievementList.forEach(c => achievementTbody.innerHTML += `<tr><td class="p-2 font-bold text-emerald-900">${c.studentName}</td><td class="p-2">${c.notes}</td><td class="p-2 text-[10px] text-slate-500">${c.updatedAt}</td><td class="p-2"><button onclick="deleteCoaching(${c.id})" class="bg-rose-600 text-white px-2 py-0.5 rounded text-[10px]">Hapus</button></td></tr>`);
-        }
-
-        function deleteCoaching(id) {
-            if (confirm('Hapus status pembinaan?')) { db.coachings = db.coachings.filter(c => c.id !== id); saveDB(); renderCoachingTables(); }
-        }
-
-        function renderParentCoachingStatus() {
-            const card = document.getElementById('parentCoachingCard');
-            const container = document.getElementById('parentCoachingContent');
-            const childName = currentSession.pChildName ? currentSession.pChildName.trim().toLowerCase() : '';
-            if (!childName) { card.classList.add('hidden'); return; }
-
-            const record = (db.coachings || []).find(c => c.className === currentSession.className && c.studentName.trim().toLowerCase() === childName);
-            if (record) {
-                card.classList.remove('hidden');
-                const isSpecial = record.category === 'Khusus';
-                container.innerHTML = `<div class="p-3 rounded-lg border ${isSpecial ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'}"><div class="font-bold flex justify-between"><span>Status: Pembinaan ${record.category}</span><span class="text-[10px] opacity-75">${record.updatedAt}</span></div><p class="text-xs mt-1"><strong>Catatan Wali Kelas:</strong> ${record.notes}</p></div>`;
-            } else card.classList.add('hidden');
-        }
-
-        // REKAP SISWA, ORTU, KUNJUNGAN RUMAH, SURAT IZIN
-        function renderStudentProfiles() {
-            const tbody = document.getElementById('studentProfileTableBody'); tbody.innerHTML = '';
-            db.users.filter(u => u.className === currentSession.className && u.role === 'Siswa').forEach(s => {
-                tbody.innerHTML += `<tr><td class="p-2 font-bold">${s.name}</td><td class="p-2">${formatWAButton(s.sPhone)}</td><td class="p-2">${formatWAButton(s.sParentPhone)}</td><td class="p-2">${s.sAddress || '-'}</td><td class="p-2">${s.sLiveWith || '-'}</td><td class="p-2">Ayah: ${s.sFather || '-'}<br>Ibu: ${s.sMother || '-'}</td><td class="p-2">Hobi: ${s.sHobby || '-'}<br>Kegiatan: ${s.sActivity || '-'}<br>Suka: ${s.sFavorite || '-'}</td><td class="p-2"><button onclick="deleteUser(${s.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button></td></tr>`;
-            });
-        }
-
-        function renderParentProfiles() {
-            const tbody = document.getElementById('parentProfileTableBody'); tbody.innerHTML = '';
-            db.users.filter(u => u.className === currentSession.className && u.role === 'Orang Tua').forEach(p => {
-                tbody.innerHTML += `<tr><td class="p-2 font-bold">${p.name}</td><td class="p-2 font-semibold text-indigo-700">${p.pChildName || '-'}</td><td class="p-2">${formatWAButton(p.pPhone)}</td><td class="p-2">Kerja: ${p.pJob || '-'}<br>Gaji: ${p.pIncome || '-'}</td><td class="p-2">${p.pAddress || '-'}</td><td class="p-2">Sifat: ${p.pTrait || '-'}<br>Karakter: ${p.pCharacter || '-'}<br>Pergaulan: ${p.pSocial || '-'}</td><td class="p-2"><button onclick="deleteUser(${p.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button></td></tr>`;
-            });
-        }
-
-        function createHomeVisit(e) {
-            e.preventDefault(); if (!db.homeVisits) db.homeVisits = [];
-            db.homeVisits.push({ id: Date.now(), className: currentSession.className, studentName: document.getElementById('visitStudentName').value, date: document.getElementById('visitDate').value, agenda: document.getElementById('visitAgenda').value });
-            saveDB(); alert('Jadwal Kunjungan Rumah Disimpan!'); renderHomeVisits();
-        }
-
-        function renderHomeVisits() {
-            const visits = (db.homeVisits || []).filter(v => v.className === currentSession.className || currentSession.role === 'superadmin');
-            const tbody = document.getElementById('homeVisitTableBody'); tbody.innerHTML = '';
-            if (visits.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada agenda kunjungan rumah.</td></tr>'; return; }
-            visits.forEach(v => {
-                tbody.innerHTML += `<tr><td class="p-2">${v.date}</td><td class="p-2 font-bold">${v.studentName}</td><td class="p-2">${v.className}</td><td class="p-2">${v.agenda}</td><td class="p-2"><button onclick="deleteHomeVisit(${v.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button></td></tr>`;
-            });
-        }
-
-        function renderParentHomeVisits() {
-            const tbody = document.getElementById('parentHomeVisitTableBody'); tbody.innerHTML = '';
-            const childName = currentSession.pChildName ? currentSession.pChildName.trim().toLowerCase() : '';
-            const visits = (db.homeVisits || []).filter(v => v.className === currentSession.className && (childName ? v.studentName.trim().toLowerCase().includes(childName) : true));
-            if (visits.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400">Belum ada agenda kunjungan.</td></tr>'; return; }
-            visits.forEach(v => {
-                tbody.innerHTML += `<tr><td class="p-2 font-semibold text-slate-700">${v.date}</td><td class="p-2 font-bold text-indigo-700">${v.studentName}</td><td class="p-2 text-slate-600">${v.agenda}</td></tr>`;
-            });
-        }
-
-        function deleteHomeVisit(id) {
-            if (confirm('Hapus agenda?')) { db.homeVisits = db.homeVisits.filter(v => v.id !== id); saveDB(); renderHomeVisits(); }
-        }
-
-        function submitPermissionLetter(e) {
-            e.preventDefault();
-            const studentName = document.getElementById('permStudentName').value;
-            const date = document.getElementById('permDate').value;
-            const reason = document.getElementById('permReason').value;
-            const notes = document.getElementById('permNotes').value;
-            const fileInput = document.getElementById('permFile');
-
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) { savePermissionRecord(studentName, date, reason, notes, e.target.result); };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else { savePermissionRecord(studentName, date, reason, notes, null); }
-        }
-
-        function savePermissionRecord(studentName, date, reason, notes, fileData) {
-            if (!db.permissions) db.permissions = [];
-            db.permissions.push({ id: Date.now(), className: currentSession.className, parentName: currentSession.name, studentName, date, reason, notes, file: fileData });
-            saveDB(); alert('Surat Izin Berhasil Dikirim!');
-        }
-
-        function renderPermissions() {
-            const tbody = document.getElementById('permissionTableBody'); tbody.innerHTML = '';
-            const permissions = (db.permissions || []).filter(p => p.className === currentSession.className);
-            if (permissions.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400">Belum ada surat izin.</td></tr>'; return; }
-            permissions.forEach(p => {
-                const docBtn = p.file ? `<a href="${p.file}" target="_blank" class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-bold">📎 Dokumen</a>` : '-';
-                tbody.innerHTML += `<tr><td class="p-2">${p.date}</td><td class="p-2 font-bold">${p.studentName}</td><td class="p-2">${p.parentName}</td><td class="p-2"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${p.reason === 'Sakit' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}">${p.reason}</span></td><td class="p-2">${p.notes || '-'}</td><td class="p-2">${docBtn}</td><td class="p-2"><button onclick="deletePermission(${p.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[10px]">Hapus</button></td></tr>`;
-            });
-        }
-
-        function deletePermission(id) {
-            if (confirm('Hapus surat izin?')) { db.permissions = db.permissions.filter(p => p.id !== id); saveDB(); renderPermissions(); }
-        }
-
-        // CSV DOWNLOAD UTILITY
-        function downloadCSV(csvContent, fileName) {
-            const encodedUri = encodeURI("data:text/csv;charset=utf-8,\uFEFF" + csvContent);
-            const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", fileName);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-
-        function downloadStudentRecap() {
-            let csv = "Nama Siswa,No HP,No WA Ortu,Alamat,Tinggal Bersama,Ayah,Ibu,Hobi,Kegiatan,Favorit\n";
-            db.users.filter(u => u.className === currentSession.className && u.role === 'Siswa').forEach(s => {
-                csv += `"${s.name}","${s.sPhone||''}","${s.sParentPhone||''}","${s.sAddress||''}","${s.sLiveWith||''}","${s.sFather||''}","${s.sMother||''}","${s.sHobby||''}","${s.sActivity||''}","${s.sFavorite||''}"\n`;
-            });
-            downloadCSV(csv, `Rekap_Siswa_Kelas_${currentSession.className}.csv`);
-        }
-
-        function downloadParentRecap() {
-            let csv = "Nama Ortu,Nama Anak,No WA,Pekerjaan,Penghasilan,Alamat,Sifat,Karakter,Pergaulan\n";
-            db.users.filter(u => u.className === currentSession.className && u.role === 'Orang Tua').forEach(p => {
-                csv += `"${p.name}","${p.pChildName||''}","${p.pPhone||''}","${p.pJob||''}","${p.pIncome||''}","${p.pAddress||''}","${p.pTrait||''}","${p.pCharacter||''}","${p.pSocial||''}"\n`;
-            });
-            downloadCSV(csv, `Rekap_OrangTua_Kelas_${currentSession.className}.csv`);
-        }
-
-        function downloadVisitRecap() {
-            let csv = "Tanggal,Nama Siswa,Kelas,Agenda\n";
-            (db.homeVisits || []).filter(v => v.className === currentSession.className).forEach(v => {
-                csv += `"${v.date}","${v.studentName}","${v.className}","${v.agenda}"\n`;
-            });
-            downloadCSV(csv, `Rekap_Kunjungan_Kelas_${currentSession.className}.csv`);
-        }
-
-        function downloadPermissionRecap() {
-            let csv = "Tanggal,Nama Siswa,Orang Tua,Kategori,Keterangan\n";
-            (db.permissions || []).filter(p => p.className === currentSession.className).forEach(p => {
-                csv += `"${p.date}","${p.studentName}","${p.parentName}","${p.reason}","${p.notes||''}"\n`;
-            });
-            downloadCSV(csv, `Rekap_Surat_Izin_Kelas_${currentSession.className}.csv`);
-        }
-
-        function downloadCoachingRecap() {
-            let csv = "Nama Siswa,Kelas,Kategori,Catatan,Tanggal Update\n";
-            (db.coachings || []).filter(c => c.className === currentSession.className).forEach(c => {
-                csv += `"${c.studentName}","${c.className}","${c.category}","${c.notes}","${c.updatedAt}"\n`;
-            });
-            downloadCSV(csv, `Rekap_Pembinaan_Kelas_${currentSession.className}.csv`);
-        }
-
-        // ISIAN DATA SISWA & ORTU
-        function saveStudentData() {
-            const idx = db.users.findIndex(u => u.id === currentSession.id);
-            if (idx !== -1) {
-                db.users[idx].sPhone = document.getElementById('sPhone').value;
-                db.users[idx].sParentPhone = document.getElementById('sParentPhone').value;
-                db.users[idx].sAddress = document.getElementById('sAddress').value;
-                db.users[idx].sLiveWith = document.getElementById('sLiveWith').value;
-                db.users[idx].sFather = document.getElementById('sFather').value;
-                db.users[idx].sMother = document.getElementById('sMother').value;
-                db.users[idx].sHobby = document.getElementById('sHobby').value;
-                db.users[idx].sActivity = document.getElementById('sActivity').value;
-                db.users[idx].sFavorite = document.getElementById('sFavorite').value;
-                currentSession = db.users[idx]; saveDB(); alert('Profil Siswa Disimpan!');
-            }
-        }
-
-        function loadStudentData() {
-            document.getElementById('sPhone').value = currentSession.sPhone || '';
-            document.getElementById('sParentPhone').value = currentSession.sParentPhone || '';
-            document.getElementById('sAddress').value = currentSession.sAddress || '';
-            document.getElementById('sLiveWith').value = currentSession.sLiveWith || '';
-            document.getElementById('sFather').value = currentSession.sFather || '';
-            document.getElementById('sMother').value = currentSession.sMother || '';
-            document.getElementById('sHobby').value = currentSession.sHobby || '';
-            document.getElementById('sActivity').value = currentSession.sActivity || '';
-            document.getElementById('sFavorite').value = currentSession.sFavorite || '';
-        }
-
-        function saveParentData() {
-            const idx = db.users.findIndex(u => u.id === currentSession.id);
-            if (idx !== -1) {
-                db.users[idx].pChildName = document.getElementById('pChildName').value;
-                db.users[idx].pPhone = document.getElementById('pPhone').value;
-                db.users[idx].pJob = document.getElementById('pJob').value;
-                db.users[idx].pIncome = document.getElementById('pIncome').value;
-                db.users[idx].pAddress = document.getElementById('pAddress').value;
-                db.users[idx].pTrait = document.getElementById('pTrait').value;
-                db.users[idx].pCharacter = document.getElementById('pCharacter').value;
-                db.users[idx].pSocial = document.getElementById('pSocial').value;
-                currentSession = db.users[idx]; saveDB(); alert('Profil Orang Tua Disimpan!');
-                renderParentHomeVisits(); renderParentCoachingStatus();
-            }
-        }
-
-        function loadParentData() {
-            document.getElementById('pChildName').value = currentSession.pChildName || '';
-            document.getElementById('pPhone').value = currentSession.pPhone || '';
-            document.getElementById('pJob').value = currentSession.pJob || '';
-            document.getElementById('pIncome').value = currentSession.pIncome || '';
-            document.getElementById('pAddress').value = currentSession.pAddress || '';
-            document.getElementById('pTrait').value = currentSession.pTrait || '';
-            document.getElementById('pCharacter').value = currentSession.pCharacter || '';
-            document.getElementById('pSocial').value = currentSession.pSocial || '';
-            document.getElementById('permStudentName').value = currentSession.pChildName || '';
-        }
-
-        function createTeacherAccount(e) {
-            e.preventDefault();
-            db.users.push({ id: Date.now(), name: document.getElementById('teacherName').value, className: document.getElementById('className').value, username: document.getElementById('teacherUsername').value, password: document.getElementById('teacherPassword').value, role: 'walikelas' });
-            saveDB(); alert('Wali Kelas Didaftarkan!'); renderTeacherList();
-        }
-
-        function renderTeacherList() {
-            document.getElementById('teacherTableBody').innerHTML = db.users.filter(u => u.role === 'walikelas').map(t => `<tr><td class="p-2 font-semibold">${t.name}</td><td class="p-2">${t.className}</td><td class="p-2">${t.username}</td></tr>`).join('');
-        }
-
-        function createStudentAccount(e) {
-            e.preventDefault();
-            db.users.push({ id: Date.now(), name: document.getElementById('studentName').value, className: currentSession.className, username: document.getElementById('studentUsername').value, password: document.getElementById('studentPassword').value, role: document.getElementById('userRoleType').value });
-            saveDB(); alert('Akun Berhasil Dibuat!'); renderAttendanceMatrix(); renderStudentProfiles(); renderParentProfiles(); renderCoachingOptions();
-        }
-
-        function deleteUser(id) {
-            if (confirm('Hapus akun ini?')) {
-                db.users = db.users.filter(u => u.id !== id);
-                saveDB(); renderStudentProfiles(); renderParentProfiles(); renderCoachingOptions();
-            }
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatMessage');
-            if (!input.value.trim()) return;
-            if (!db.discussions) db.discussions = [];
-            db.discussions.unshift({ id: Date.now(), className: currentSession.className, sender: currentSession.name, role: currentSession.role, text: input.value, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-            saveDB(); input.value = ''; renderDiscussions();
-        }
-
-        function renderDiscussions() {
-            const chats = (db.discussions || []).filter(d => d.className === currentSession.className || currentSession.role === 'superadmin');
-            document.getElementById('chatContainer').innerHTML = chats.map(c => `<div class="p-2 bg-slate-50 border rounded text-xs"><div class="flex justify-between font-bold text-indigo-600"><span>${c.sender} (${c.role})</span><span>${c.time}</span></div><p class="text-slate-700 mt-1 text-sm">${c.text}</p></div>`).join('');
-        }
-    </script>
+        renderPengumuman(data.pengumuman || [], 'pengumumanList');
+      }
+      else if(user.role === 'ortu') {
+        document.getElementById('ortuDashboard').classList.remove('hidden');
+        renderPengumuman(data.pengumuman || [], 'pengumumanOrtuList');
+      }
+    }
+
+    function renderPengumuman(pengumumanData, targetId) {
+      const container = document.getElementById(targetId);
+      container.innerHTML = '';
+      if(pengumumanData.length > 1) {
+        pengumumanData.slice(1).reverse().forEach(p => {
+          container.innerHTML += `
+            <div class="border-l-4 border-indigo-600 pl-4 py-3 bg-slate-50 rounded-r-xl shadow-sm">
+              <h4 class="font-bold text-slate-800">${p[1]}</h4>
+              <span class="text-[10px] text-indigo-600 font-bold"><i class="fa-regular fa-clock mr-1"></i>${p[0]} - Oleh: ${p[3]}</span>
+              <p class="mt-2 text-sm text-slate-600">${p[2]}</p>
+            </div>
+          `;
+        });
+      } else {
+        container.innerHTML = '<p class="text-sm text-slate-400 italic">Belum ada pengumuman diterbitkan.</p>';
+      }
+    }
+
+    async function initDatabase() {
+      if (confirm("Apakah Anda yakin ingin menyiapkan / mereset struktur tabel Google Sheets?")) {
+        const res = await callBackend('setupDatabase', {});
+        alert(res.message);
+      }
+    }
+
+    // HANDLERS UNTUK WALI KELAS & ORTU
+    document.getElementById('formWali')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const res = await callBackend('buatAkunWali', {
+        nama: document.getElementById('waliNama').value,
+        username: document.getElementById('waliUser').value,
+        password: document.getElementById('waliPass').value
+      });
+      alert(res.message);
+      if(res.success) this.reset();
+    });
+
+    document.getElementById('formKunjungan')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const res = await callBackend('tambahKunjungan', {
+        nisn: document.getElementById('kujNisn').value,
+        namaSiswa: document.getElementById('kujNama').value,
+        catatan: document.getElementById('kujCatatan').value,
+        waliKelas: currentUser.nama
+      });
+      alert(res.message);
+      if(res.success) this.reset();
+    });
+
+    document.getElementById('formPengumuman')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const res = await callBackend('tambahPengumuman', {
+        judul: document.getElementById('pJudul').value,
+        isi: document.getElementById('pIsi').value,
+        waliKelas: currentUser.nama
+      });
+      alert(res.message);
+      if(res.success) this.reset();
+    });
+
+    document.getElementById('formIzin')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const res = await callBackend('kirimIzin', {
+        nisn: document.getElementById('izNisn').value,
+        namaSiswa: document.getElementById('izNama').value,
+        keterangan: document.getElementById('izKet').value
+      });
+      alert(res.message);
+      if(res.success) this.reset();
+    });
+  </script>
 </body>
 </html>
